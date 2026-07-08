@@ -142,22 +142,22 @@ wayfind = { path = "." }
 memchr = { version = "2.8", default-features = false, features = ["alloc"] }
 
 # Testing
-insta = { version = "1.47", default-features = false }
+insta = { version = "1.48", default-features = false }
 similar-asserts = { version = "2.0", default-features = false }
 
 # Fuzzing
 libfuzzer-sys = { version = "0.4", default-features = false, features = ["link_libfuzzer"] }
 
 # Benchmarking
-divan = { package = "codspeed-divan-compat", version = "4.7", default-features = false }
+divan = { package = "codspeed-divan-compat", version = "5.0", default-features = false }
 
 # Routers
 actix-router = { version = "=0.5.4", default-features = false }
-matchit = { version = "=0.9.1", default-features = false }
+matchit = { version = "=0.9.2", default-features = false }
 ntex-router = { version = "=1.0.0", default-features = false }
 path-tree = { version = "=0.8.3", default-features = false }
 route-recognizer = { version = "=0.3.1", default-features = false }
-xitca-router = { version = "=0.4.1", default-features = false }
+xitca-router = { version = "=0.4.3", default-features = false }
 
 # https://doc.rust-lang.org/cargo/reference/manifest.html
 [package]

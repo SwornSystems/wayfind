@@ -57,10 +57,11 @@ fn dynamic_multiple() -> Result<(), Box<dyn Error>> {
     let search = router.search("/2024/12/01").unwrap();
     assert_eq!(search.data(), &3);
     assert_eq!(search.template(), "/<year>/<month>/<day>");
-    assert_eq!(
-        search.parameters(),
-        &[("year", "2024"), ("month", "12"), ("day", "01")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("year", "2024"),
+        ("month", "12"),
+        ("day", "01")
+    ]);
 
     Ok(())
 }
@@ -220,10 +221,10 @@ fn dynamic_inline_params() -> Result<(), Box<dyn Error>> {
     let search = router.search("/archive.tar.gz").unwrap();
     assert_eq!(search.data(), &1);
     assert_eq!(search.template(), "/<id>.<format>");
-    assert_eq!(
-        search.parameters(),
-        &[("id", "archive.tar"), ("format", "gz")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("id", "archive.tar"),
+        ("format", "gz")
+    ]);
 
     let search = router.search("/report.pdf").unwrap();
     assert_eq!(search.data(), &1);
@@ -317,10 +318,10 @@ fn dynamic_inline_coexistence() -> Result<(), Box<dyn Error>> {
     let search = router.search("/archive.tar.gz").unwrap();
     assert_eq!(search.data(), &1);
     assert_eq!(search.template(), "/<id>.<format>");
-    assert_eq!(
-        search.parameters(),
-        &[("id", "archive.tar"), ("format", "gz")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("id", "archive.tar"),
+        ("format", "gz")
+    ]);
 
     Ok(())
 }

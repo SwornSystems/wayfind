@@ -1,19 +1,8 @@
 # https://doc.rust-lang.org/cargo/reference/config.html
 
-# https://doc.rust-lang.org/cargo/reference/unstable.html
-[unstable]
-codegen-backend = true
-feature-unification = true
-profile-hint-mostly-unused = true
-
-# https://doc.rust-lang.org/cargo/reference/resolver.html
-[resolver]
-feature-unification = "workspace"
-
 # https://doc.rust-lang.org/cargo/reference/profiles.html#dev
 [profile.dev]
 debug = "line-tables-only"
-hint-mostly-unused = true
 split-debuginfo = "unpacked"
 
 [profile.dev.package."*"]
@@ -25,7 +14,6 @@ opt-level = 3
 # https://doc.rust-lang.org/cargo/reference/profiles.html#release
 [profile.release]
 debug = "limited"
-hint-mostly-unused = true
 lto = "thin"
 split-debuginfo = "packed"
 strip = "debuginfo"

@@ -53,7 +53,7 @@ impl fmt::Display for InsertError {
             Self::DuplicateParameter { name } => write!(f, "duplicate parameter name `{name}`"),
             Self::TouchingParameters => {
                 write!(f, "parameters must be separated by a static character")
-            }
+            },
             Self::Conflict { existing } => write!(f, "conflicts with `{existing}`"),
         }
     }

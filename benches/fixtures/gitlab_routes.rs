@@ -5,6 +5,7 @@
 //! Rails disambiguates these with regex constraints, which we don't support.
 
 #[must_use]
+#[rustfmt::skip]
 #[expect(clippy::too_many_lines, reason = "Test")]
 pub(crate) fn routes() -> Vec<&'static str> {
     vec![

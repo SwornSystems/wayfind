@@ -65,16 +65,16 @@ impl<'a> Template<'a> {
 
                     parts.push(part);
                     cursor = next;
-                }
+                },
                 b'>' => {
                     return Err(InsertError::UnbalancedAngle);
-                }
+                },
                 _ => {
                     let (part, next_cursor) = Self::parse_static_part(input, cursor);
 
                     parts.push(part);
                     cursor = next_cursor;
-                }
+                },
             }
         }
 
@@ -153,10 +153,9 @@ mod tests {
         assert_eq!(
             Template::new("/<name>"),
             Ok(Template {
-                parts: vec![
-                    Part::Dynamic { name: "name" },
-                    Part::Static { prefix: b"/" },
-                ],
+                parts: vec![Part::Dynamic { name: "name" }, Part::Static {
+                    prefix: b"/"
+                },],
             }),
         );
     }
@@ -166,10 +165,9 @@ mod tests {
         assert_eq!(
             Template::new("/<*wildcard>"),
             Ok(Template {
-                parts: vec![
-                    Part::Wildcard { name: "wildcard" },
-                    Part::Static { prefix: b"/" },
-                ],
+                parts: vec![Part::Wildcard { name: "wildcard" }, Part::Static {
+                    prefix: b"/"
+                },],
             }),
         );
     }
@@ -179,10 +177,9 @@ mod tests {
         assert_eq!(
             Template::new("/files/<*path>"),
             Ok(Template {
-                parts: vec![
-                    Part::Wildcard { name: "path" },
-                    Part::Static { prefix: b"/files/" },
-                ],
+                parts: vec![Part::Wildcard { name: "path" }, Part::Static {
+                    prefix: b"/files/"
+                },],
             }),
         );
     }

@@ -47,22 +47,19 @@ fn readme() -> Result<(), Box<dyn Error>> {
         .unwrap();
 
     assert_eq!(search.data(), &"end-2");
-    assert_eq!(
-        search.parameters(),
-        &[
-            ("name", "myorg/myrepo"),
-            ("algorithm", "sha256"),
-            ("hash", "2c26b46b68ff"),
-        ]
-    );
+    assert_eq!(search.parameters(), &[
+        ("name", "myorg/myrepo"),
+        ("algorithm", "sha256"),
+        ("hash", "2c26b46b68ff"),
+    ]);
 
     let search = router.search("/v2/myorg/myrepo/manifests/latest").unwrap();
 
     assert_eq!(search.data(), &"end-3");
-    assert_eq!(
-        search.parameters(),
-        &[("name", "myorg/myrepo"), ("reference", "latest")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("name", "myorg/myrepo"),
+        ("reference", "latest")
+    ]);
 
     let search = router.search("/v2/myorg/myrepo/blobs/uploads").unwrap();
 
@@ -74,10 +71,10 @@ fn readme() -> Result<(), Box<dyn Error>> {
         .unwrap();
 
     assert_eq!(search.data(), &"end-5");
-    assert_eq!(
-        search.parameters(),
-        &[("name", "myorg/myrepo"), ("reference", "e361beb4-576f")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("name", "myorg/myrepo"),
+        ("reference", "e361beb4-576f")
+    ]);
 
     let search = router.search("/v2/myorg/myrepo/tags/list").unwrap();
 
@@ -89,14 +86,11 @@ fn readme() -> Result<(), Box<dyn Error>> {
         .unwrap();
 
     assert_eq!(search.data(), &"end-12a");
-    assert_eq!(
-        search.parameters(),
-        &[
-            ("name", "myorg/myrepo"),
-            ("algorithm", "sha256"),
-            ("hash", "2c26b46b68ff"),
-        ]
-    );
+    assert_eq!(search.parameters(), &[
+        ("name", "myorg/myrepo"),
+        ("algorithm", "sha256"),
+        ("hash", "2c26b46b68ff"),
+    ]);
 
     Ok(())
 }
