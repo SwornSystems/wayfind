@@ -23,7 +23,7 @@ impl<T: Copy, const N: usize> Storage<T, N> {
                 } else {
                     None
                 }
-            }
+            },
             Self::Heap(items) => items.get(index),
         }
     }
@@ -39,7 +39,7 @@ impl<T: Copy, const N: usize> Storage<T, N> {
     pub(crate) fn slot(&mut self, index: usize, fill: T) -> Option<&mut T> {
         let ready = match self {
             Self::Empty => false,
-            Self::Inline(_, _) => index < N,
+            Self::Inline(..) => index < N,
             Self::Heap(items) => index < items.len(),
         };
 
@@ -59,16 +59,16 @@ impl<T: Copy, const N: usize> Storage<T, N> {
                 } else {
                     *self = Self::Heap(vec![fill; index + 1]);
                 }
-            }
+            },
             Self::Inline(items, _) => {
                 let mut spilled = Vec::with_capacity(index + 1);
                 spilled.extend_from_slice(items);
                 spilled.resize(index + 1, fill);
                 *self = Self::Heap(spilled);
-            }
+            },
             Self::Heap(items) => {
                 items.resize(index + 1, fill);
-            }
+            },
         }
 
         self.get_mut(index)
@@ -100,7 +100,7 @@ impl<T: Copy, const N: usize> Storage<T, N> {
                 spilled.extend_from_slice(items);
                 spilled.push(item);
                 *self = Self::Heap(spilled);
-            }
+            },
             Self::Heap(items) => items.push(item),
         }
     }
@@ -111,7 +111,7 @@ impl<T: Copy, const N: usize> Storage<T, N> {
             Self::Inline(items, length) => {
                 *length = length.checked_sub(1)?;
                 items.get(*length).copied()
-            }
+            },
             Self::Heap(items) => items.pop(),
         }
     }

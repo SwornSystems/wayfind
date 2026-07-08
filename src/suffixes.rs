@@ -95,7 +95,8 @@ impl Suffixes {
         Self(suffixes.into_boxed_slice())
     }
 
-    /// Walks a static subtree, recording the accumulated prefix at each node that can terminate a route.
+    /// Walks a static subtree, recording the accumulated prefix at each node
+    /// that can terminate a route.
     fn walk_static<T>(
         node: &Node<StaticState, T>,
         prefix: &mut Vec<u8>,

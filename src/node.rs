@@ -191,7 +191,7 @@ impl<S, T> Node<S, T> {
                 Some(_) | None => {
                     ctx.lower(id, offset);
                     continue;
-                }
+                },
             };
 
             if remaining.len() - limit < child.bounds.shortest() {
@@ -269,7 +269,7 @@ impl<S, T> Node<S, T> {
                 Some(_) | None => {
                     ctx.lower(id, offset);
                     continue;
-                }
+                },
             };
 
             if remaining.len() - limit < child.bounds.shortest() {

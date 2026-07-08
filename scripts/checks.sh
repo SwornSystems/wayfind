@@ -14,7 +14,7 @@ tombi lint --error-on-warnings
 zizmor --pedantic .github
 cargo fmt --all --check
 cargo shear --locked
-cargo deny check
+cargo deny check --deny warnings
 cargo clippy --locked --workspace --all-targets
 cargo build --locked --workspace --all-targets
 cargo nextest run --locked --workspace --no-tests pass

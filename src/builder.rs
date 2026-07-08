@@ -47,13 +47,10 @@ impl<T> RouterBuilder<T> {
             });
         }
 
-        self.root.insert(
-            &mut parsed,
-            Data {
-                data,
-                template: template.into(),
-            },
-        );
+        self.root.insert(&mut parsed, Data {
+            data,
+            template: template.into(),
+        });
 
         Ok(())
     }
@@ -129,7 +126,7 @@ impl<S, T> BuilderNode<S, T> {
             Part::Dynamic { name } => self.insert_dynamic(template, data, name),
             Part::Wildcard { name } if template.parts.is_empty() => {
                 self.insert_end_wildcard(data, name);
-            }
+            },
             Part::Wildcard { name } => self.insert_wildcard(template, data, name),
         }
     }

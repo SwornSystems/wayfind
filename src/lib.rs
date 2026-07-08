@@ -34,7 +34,7 @@
 //!
 //! assert!(router.search("/world").is_none());
 //! # Ok::<_, Box<dyn core::error::Error>>(())
-//!```
+//! ```
 //!
 //! ### Dynamic
 //!
@@ -63,13 +63,17 @@
 //! let search = router.search("/users/123/files/my.document.pdf").unwrap();
 //! assert_eq!(search.data(), &2);
 //! assert_eq!(search.template(), "/users/<id>/files/<filename>.pdf");
-//! assert_eq!(search.parameters(), &[("id", "123"), ("filename", "my.document")]);
+//! assert_eq!(search.parameters(), &[
+//!     ("id", "123"),
+//!     ("filename", "my.document")
+//! ]);
 //! # Ok::<_, Box<dyn core::error::Error>>(())
-//!```
+//! ```
 //!
 //! ### Wildcard
 //!
-//! Wildcard parameters can match any byte, **including** the path delimiter `/`.
+//! Wildcard parameters can match any byte, **including** the path delimiter
+//! `/`.
 //!
 //! Supported forms:
 //! - inline wildcards: `/<*path>.html`
@@ -87,10 +91,15 @@
 //!
 //! let router = builder.build();
 //!
-//! let search = router.search("/files/documents/reports/annual.pdf/delete").unwrap();
+//! let search = router
+//!     .search("/files/documents/reports/annual.pdf/delete")
+//!     .unwrap();
 //! assert_eq!(search.data(), &1);
 //! assert_eq!(search.template(), "/files/<*slug>/delete");
-//! assert_eq!(search.parameters(), &[("slug", "documents/reports/annual.pdf")]);
+//! assert_eq!(search.parameters(), &[(
+//!     "slug",
+//!     "documents/reports/annual.pdf"
+//! )]);
 //!
 //! let search = router.search("/any/other/path").unwrap();
 //! assert_eq!(search.data(), &2);
@@ -110,7 +119,8 @@
 //!
 //! ## Display
 //!
-//! The router can be printed as a tree, via a [`Display`](core::fmt::Display) implementation.
+//! The router can be printed as a tree, via a [`Display`](core::fmt::Display)
+//! implementation.
 
 #![no_std]
 extern crate alloc;

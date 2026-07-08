@@ -55,10 +55,10 @@ fn wildcard_multiple() -> Result<(), Box<dyn Error>> {
     let search = router.search("/a/b/c/static/d/e/f/file").unwrap();
     assert_eq!(search.data(), &1);
     assert_eq!(search.template(), "/<*prefix>/static/<*suffix>/file");
-    assert_eq!(
-        search.parameters(),
-        &[("prefix", "a/b/c"), ("suffix", "d/e/f")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("prefix", "a/b/c"),
+        ("suffix", "d/e/f")
+    ]);
 
     Ok(())
 }
@@ -191,10 +191,10 @@ fn wildcard_greedy() -> Result<(), Box<dyn Error>> {
     let search = router.search("/documents/edit/summary").unwrap();
     assert_eq!(search.data(), &1);
     assert_eq!(search.template(), "/<*path>/edit/<*rest>");
-    assert_eq!(
-        search.parameters(),
-        &[("path", "documents"), ("rest", "summary")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("path", "documents"),
+        ("rest", "summary")
+    ]);
 
     let search = router.search("/docs/edit/readme/delete").unwrap();
     assert_eq!(search.data(), &2);
@@ -224,10 +224,10 @@ fn wildcard_dynamic() -> Result<(), Box<dyn Error>> {
     let search = router.search("/api/docs/reference/help").unwrap();
     assert_eq!(search.data(), &1);
     assert_eq!(search.template(), "/api/<version>/<*rest>");
-    assert_eq!(
-        search.parameters(),
-        &[("version", "docs"), ("rest", "reference/help")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("version", "docs"),
+        ("rest", "reference/help")
+    ]);
 
     Ok(())
 }
@@ -269,10 +269,10 @@ fn wildcard_fallthrough() -> Result<(), Box<dyn Error>> {
     let search = router.search("/gitlab-org/gitlab/-/issues").unwrap();
     assert_eq!(search.data(), &2);
     assert_eq!(search.template(), "/<*namespace_id>/<project_id>/-/issues");
-    assert_eq!(
-        search.parameters(),
-        &[("namespace_id", "gitlab-org"), ("project_id", "gitlab")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("namespace_id", "gitlab-org"),
+        ("project_id", "gitlab")
+    ]);
 
     Ok(())
 }
@@ -292,13 +292,10 @@ fn wildcard_namespace() -> Result<(), Box<dyn Error>> {
         search.template(),
         "/<*namespace_id>/<project_id>/-/merge_requests"
     );
-    assert_eq!(
-        search.parameters(),
-        &[
-            ("namespace_id", "gitlab-org/frontend"),
-            ("project_id", "gitlab-ui")
-        ],
-    );
+    assert_eq!(search.parameters(), &[
+        ("namespace_id", "gitlab-org/frontend"),
+        ("project_id", "gitlab-ui")
+    ],);
 
     Ok(())
 }
@@ -326,10 +323,10 @@ fn wildcard_catchall() -> Result<(), Box<dyn Error>> {
     let search = router.search("/gitlab-org/gitlab/-/issues").unwrap();
     assert_eq!(search.data(), &2);
     assert_eq!(search.template(), "/<username>/<*rest>");
-    assert_eq!(
-        search.parameters(),
-        &[("username", "gitlab-org"), ("rest", "gitlab/-/issues")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("username", "gitlab-org"),
+        ("rest", "gitlab/-/issues")
+    ]);
 
     Ok(())
 }
@@ -392,10 +389,11 @@ fn wildcard_branches() -> Result<(), Box<dyn Error>> {
     let search = router.search("/gitlab-org/gitlab/-/wikis/home").unwrap();
     assert_eq!(search.data(), &1);
     assert_eq!(search.template(), "/<*a>/<b>/-/wikis/<c>");
-    assert_eq!(
-        search.parameters(),
-        &[("a", "gitlab-org"), ("b", "gitlab"), ("c", "home")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("a", "gitlab-org"),
+        ("b", "gitlab"),
+        ("c", "home")
+    ]);
 
     let search = router.search("/gitlab-org/-/settings").unwrap();
     assert_eq!(search.data(), &2);
@@ -415,10 +413,10 @@ fn wildcard_ambiguous() -> Result<(), Box<dyn Error>> {
     let search = router.search("/a/-/issues/real-project/-/issues").unwrap();
     assert_eq!(search.data(), &1);
     assert_eq!(search.template(), "/<*a>/<b>/-/issues");
-    assert_eq!(
-        search.parameters(),
-        &[("a", "a/-/issues"), ("b", "real-project")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("a", "a/-/issues"),
+        ("b", "real-project")
+    ]);
 
     Ok(())
 }
@@ -614,10 +612,11 @@ fn wildcard_nested_backtrack() -> Result<(), Box<dyn Error>> {
     let search = router.search("/x/y/x/y/x/y/q").unwrap();
     assert_eq!(search.data(), &1);
     assert_eq!(search.template(), "/<*a>/x/<*b>/y/<c>");
-    assert_eq!(
-        search.parameters(),
-        &[("a", "x/y"), ("b", "y/x"), ("c", "q")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("a", "x/y"),
+        ("b", "y/x"),
+        ("c", "q")
+    ]);
 
     Ok(())
 }
@@ -705,10 +704,10 @@ fn wildcard_inline_sibling() -> Result<(), Box<dyn Error>> {
     let search = router.search("/docs/raw/page").unwrap();
     assert_eq!(search.data(), &1);
     assert_eq!(search.template(), "/<*path>/<file>");
-    assert_eq!(
-        search.parameters(),
-        &[("path", "docs/raw"), ("file", "page")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("path", "docs/raw"),
+        ("file", "page")
+    ]);
 
     let search = router.search("/docs/raw").unwrap();
     assert_eq!(search.data(), &3);
@@ -735,10 +734,10 @@ fn wildcard_inline_segment() -> Result<(), Box<dyn Error>> {
     let search = router.search("/var//log/app").unwrap();
     assert_eq!(search.data(), &1);
     assert_eq!(search.template(), "/<*path>/<file>");
-    assert_eq!(
-        search.parameters(),
-        &[("path", "var//log"), ("file", "app")]
-    );
+    assert_eq!(search.parameters(), &[
+        ("path", "var//log"),
+        ("file", "app")
+    ]);
 
     Ok(())
 }

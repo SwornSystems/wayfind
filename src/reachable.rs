@@ -26,7 +26,7 @@ impl Condition {
                         .rev()
                         .zip(remaining.iter().rev())
                         .all(|(a, b)| a == b)
-            }
+            },
             Self::Contains { needle, id } => needles
                 .rightmost(*id, needle, path)
                 .is_some_and(|position| position >= offset),
