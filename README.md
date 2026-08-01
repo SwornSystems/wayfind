@@ -7,16 +7,16 @@
 ![`wasm`: compatible](https://img.shields.io/badge/wasm-compatible-success.svg)
 ![`no-std`: compatible](https://img.shields.io/badge/no--std-compatible-success.svg)
 
-[![codecov](https://codecov.io/gh/DuskSystems/wayfind/graph/badge.svg)](https://codecov.io/gh/DuskSystems/wayfind)
-[![codspeed](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/DuskSystems/wayfind)
+[![codecov](https://codecov.io/gh/SwornSystems/wayfind/graph/badge.svg)](https://app.codecov.io/gh/SwornSystems/wayfind)
+[![codspeed](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://app.codspeed.io/SwornSystems/wayfind)
 
 # `wayfind`
 
 A speedy, flexible router for Rust.
 
-## Why another router?
+## Why another router
 
-Real-world projects often need advanced routing: inline parameters, mid-route wildcards, or compatibility with frameworks like [Ruby on Rails](https://guides.rubyonrails.org/routing.html) and specifications like the [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec/blob/main/spec.md).
+Real-world projects often need advanced routing: inline parameters, mid-route wildcards, or compatibility with frameworks such as [Ruby on Rails](https://guides.rubyonrails.org/routing.html) and specifications such as the [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec/blob/main/spec.md).
 
 `wayfind` aims to be competitive with the fastest routers while supporting these features. Unused features don't impact performance.
 
@@ -127,8 +127,8 @@ All parameters are greedy, consuming as much of the path as possible.
 
 ### Limitations
 
-There is no backtracking across priority levels.
-This can result in some matches which may be unexpected.
+No backtracking happens across priority levels.
+Some matches can surprise you.
 
 In the following router:
 
@@ -150,7 +150,7 @@ Even though the second is arguably more specific.
 
 For all benchmarks, we convert any extracted parameters to strings.
 
-All routers provide a way to return parameters as strings, but some delay the actual UTF-8 decoding until post-search.
+All routers offer a way to return parameters as strings, but some delay the actual UTF-8 decoding until post-search.
 
 | Library          | Percent Decoding | String Parameters |
 |:-----------------|:----------------:|:-----------------:|
@@ -162,15 +162,15 @@ All routers provide a way to return parameters as strings, but some delay the ac
 | route-recognizer | no               | yes               |
 | xitca-router     | no               | yes               |
 
-As such, we provide 2 sets of results per benchmark:
+As such, we offer 2 sets of results per benchmark:
 - one with the default behaviour of the router.
 - one with the parameters extracted to `Vec<(&str, &str)>`.
 
-See the results at: https://codspeed.io/DuskSystems/wayfind/benchmarks
+See the results at: https://app.codspeed.io/SwornSystems/wayfind/benchmarks
 
 ## License
 
-`wayfind` is licensed under the terms of both the [MIT License](LICENSE-MIT) and the [Apache License (Version 2.0)](LICENSE-APACHE).
+Licensed under the terms of both the [MIT License](LICENSE-MIT) and the [Apache License (Version 2.0)](LICENSE-APACHE).
 
 ## Inspirations
 

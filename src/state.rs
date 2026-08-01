@@ -24,7 +24,7 @@ impl fmt::Display for RootState {
 /// A static byte prefix.
 #[derive(Clone, Debug)]
 pub(crate) struct StaticState {
-    /// May not be valid UTF-8 due to multibyte splitting.
+    /// Might not be valid UTF-8 due to multibyte splitting.
     pub prefix: Box<[u8]>,
 }
 
@@ -90,7 +90,7 @@ impl fmt::Display for WildcardState {
 #[derive(Clone, Debug)]
 pub(crate) struct EndWildcardState<T> {
     pub name: Box<str>,
-    /// Data is stored directly to avoid the need for the full `Node` machinery.
+    /// Stores data directly to avoid the need for the full `Node` machinery.
     pub data: Data<T>,
 }
 

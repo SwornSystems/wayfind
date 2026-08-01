@@ -7,7 +7,7 @@ members = [".", "fuzz"]
 version = "1.0.3"
 edition = "2024"
 rust-version = "1.85"
-repository = "https://github.com/DuskSystems/wayfind"
+repository = "https://github.com/SwornSystems/wayfind"
 license = "MIT OR Apache-2.0"
 keywords = ["router"]
 categories = ["network-programming", "web-programming"]
@@ -17,16 +17,17 @@ categories = ["network-programming", "web-programming"]
 unsafe_code = "forbid"
 
 unused = { level = "deny", priority = -2 }
-future-incompatible = { level = "deny", priority = -1 }
-keyword-idents = { level = "deny", priority = -1 }
-let-underscore = { level = "deny", priority = -1 }
-nonstandard-style = { level = "deny", priority = -1 }
-refining-impl-trait = { level = "deny", priority = -1 }
-rust-2018-compatibility = { level = "deny", priority = -1 }
-rust-2018-idioms = { level = "deny", priority = -1 }
-rust-2021-compatibility = { level = "deny", priority = -1 }
-rust-2024-compatibility = { level = "deny", priority = -1 }
+future_incompatible = { level = "deny", priority = -1 }
+keyword_idents = { level = "deny", priority = -1 }
+let_underscore = { level = "deny", priority = -1 }
+nonstandard_style = { level = "deny", priority = -1 }
+refining_impl_trait = { level = "deny", priority = -1 }
+rust_2018_compatibility = { level = "deny", priority = -1 }
+rust_2018_idioms = { level = "deny", priority = -1 }
+rust_2021_compatibility = { level = "deny", priority = -1 }
+rust_2024_compatibility = { level = "deny", priority = -1 }
 
+linker_messages = "allow"
 missing_docs = "deny"
 trivial_numeric_casts = "deny"
 unnameable_types = "deny"

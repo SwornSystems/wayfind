@@ -3,18 +3,18 @@ use crate::node::Node;
 /// Pre-computed path length bounds for pruning during search.
 #[derive(Clone, Debug)]
 pub(crate) struct Bounds {
-    /// Minimum remaining path bytes to reach any match.
-    shortest: usize,
+    /// Lower bound on remaining path bytes to reach any match.
+    lower: usize,
 
-    /// Maximum remaining path bytes that could still match.
-    longest: usize,
+    /// Upper bound on remaining path bytes that could still match.
+    upper: usize,
 }
 
 impl Default for Bounds {
     fn default() -> Self {
         Self {
-            shortest: usize::MAX,
-            longest: 0,
+            lower: usize::MAX,
+            upper: 0,
         }
     }
 }
@@ -22,20 +22,20 @@ impl Default for Bounds {
 impl Bounds {
     pub(crate) fn compute<S, T>(node: &Node<S, T>) -> Self {
         Self {
-            shortest: Self::compute_shortest(node),
-            longest: Self::compute_longest(node),
+            lower: Self::compute_lower(node),
+            upper: Self::compute_upper(node),
         }
     }
 
-    pub(crate) const fn shortest(&self) -> usize {
-        self.shortest
+    pub(crate) const fn lower(&self) -> usize {
+        self.lower
     }
 
-    pub(crate) const fn longest(&self) -> usize {
-        self.longest
+    pub(crate) const fn upper(&self) -> usize {
+        self.upper
     }
 
-    fn compute_shortest<S, T>(node: &Node<S, T>) -> usize {
+    fn compute_lower<S, T>(node: &Node<S, T>) -> usize {
         // A node with data can match here with 0 remaining bytes.
         if node.data.is_some() {
             return 0;
@@ -46,23 +46,20 @@ impl Bounds {
             return 1;
         }
 
-        let static_lengths = node.static_children.iter().map(|child| {
-            child
-                .state
-                .prefix
-                .len()
-                .saturating_add(child.bounds.shortest)
-        });
+        let static_lengths = node
+            .static_children
+            .iter()
+            .map(|child| child.state.prefix.len().saturating_add(child.bounds.lower));
 
         let dynamic_lengths = node
             .dynamic_children
             .iter()
-            .map(|child| child.bounds.shortest.saturating_add(1));
+            .map(|child| child.bounds.lower.saturating_add(1));
 
         let wildcard_lengths = node
             .wildcard_children
             .iter()
-            .map(|child| child.bounds.shortest.saturating_add(1));
+            .map(|child| child.bounds.lower.saturating_add(1));
 
         static_lengths
             .chain(dynamic_lengths)
@@ -71,7 +68,7 @@ impl Bounds {
             .unwrap_or(usize::MAX)
     }
 
-    fn compute_longest<S, T>(node: &Node<S, T>) -> usize {
+    fn compute_upper<S, T>(node: &Node<S, T>) -> usize {
         // Parameters can consume any input.
         if node.has_parameters() {
             return usize::MAX;
@@ -79,13 +76,7 @@ impl Bounds {
 
         node.static_children
             .iter()
-            .map(|child| {
-                child
-                    .state
-                    .prefix
-                    .len()
-                    .saturating_add(child.bounds.longest)
-            })
+            .map(|child| child.state.prefix.len().saturating_add(child.bounds.upper))
             .max()
             .unwrap_or(0)
     }

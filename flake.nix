@@ -18,6 +18,7 @@
   # nix flake show
   outputs =
     {
+      self,
       nixpkgs,
       rust-overlay,
       ...
@@ -33,6 +34,7 @@
           inherit system;
 
           overlays = [
+            self.overlays.default
             rust-overlay.overlays.default
           ];
         }
@@ -41,6 +43,19 @@
       perSystemPkgs = f: perSystem (system: f (systemPkgs.${system}));
     in
     {
+      overlays = {
+        default = final: _prev: {
+          vale-styles = final.symlinkJoin {
+            name = "vale-styles";
+            paths = with final.valeStyles; [
+              proselint
+              write-good
+              redhat
+            ];
+          };
+        };
+      };
+
       devShells = perSystemPkgs (pkgs: {
         # nix develop
         default = pkgs.mkShell.override { stdenv = pkgs.useWildLinker pkgs.stdenv; } {
@@ -49,6 +64,9 @@
           env = {
             # Nix
             NIX_PATH = "nixpkgs=${nixpkgs.outPath}";
+
+            # Vale
+            VALE_STYLES_PATH = "${pkgs.vale-styles}/share/vale/styles";
 
             # Rust
             RUSTFLAGS = pkgs.lib.concatStringsSep " " [
@@ -102,16 +120,28 @@
 
             # GitHub
             gh
+            pinact
             zizmor
 
             # Spellchecking
             typos
             typos-lsp
 
+            # Markdown
+            lychee
+            vale
+            vale-ls
+
             # TOML
             tombi
 
+            # Nushell
+            nushell
+            nufmt
+            nu-lint
+
             # Nix
+            deadnix
             nixfmt
             nixd
             nil
@@ -123,6 +153,9 @@
           name = "wayfind-ci-shell";
 
           env = {
+            # Vale
+            VALE_STYLES_PATH = "${pkgs.vale-styles}/share/vale/styles";
+
             # Rust
             RUSTC_WRAPPER = "sccache";
             RUSTFLAGS = pkgs.lib.concatStringsSep " " [
@@ -166,10 +199,20 @@
             # Spellchecking
             typos
 
+            # Markdown
+            lychee
+            vale
+
             # TOML
             tombi
 
+            # Nushell
+            nushell
+            nufmt
+            nu-lint
+
             # Nix
+            deadnix
             nixfmt
           ];
         };
@@ -195,6 +238,9 @@
               ];
             })
             sccache
+
+            # Nushell
+            nushell
           ];
         };
       });

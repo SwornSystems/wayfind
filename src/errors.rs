@@ -12,19 +12,19 @@ pub enum InsertError {
     /// The template does not start with `/`.
     MissingSlash,
 
-    /// An unbalanced `<` or `>` was found in the template.
+    /// The template has an unbalanced `<` or `>`.
     UnbalancedAngle,
 
     /// A parameter name is empty.
     EmptyParameter,
 
-    /// A parameter name contains invalid characters.
+    /// A parameter name has invalid characters.
     InvalidParameter {
         /// The invalid parameter name.
         name: String,
     },
 
-    /// A parameter name appears more than once in the template.
+    /// The template repeats a parameter name.
     DuplicateParameter {
         /// The duplicated parameter name.
         name: String,
