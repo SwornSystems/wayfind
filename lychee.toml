@@ -1,0 +1,19 @@
+# https://lychee.cli.rs/guides/config
+
+cache = true
+cache_exclude_status = ["400..=599"]
+max_cache_age = "1d"
+
+max_redirects = 0
+
+include_fragments = "full"
+exclude_loopback = true
+exclude_private = true
+
+exclude = [
+  "https://crates.io",
+  "https://docs.rs",
+]
+exclude_path = [
+  "CHANGELOG.md",
+]

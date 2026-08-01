@@ -11,10 +11,26 @@
       "formatter": "language_server"
     },
 
+    "Markdown": {
+      "language_servers": ["vale", "typos"],
+      "soft_wrap": "none"
+    },
+
     "TOML": {
       "language_servers": ["tombi"],
       "format_on_save": "on",
       "formatter": "language_server"
+    },
+
+    "Nu": {
+      "language_servers": ["nu", "nu-lint"],
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "nufmt",
+          "arguments": ["--stdin"]
+        }
+      }
     },
 
     "Nix": {
@@ -56,10 +72,30 @@
       }
     },
 
+    "vale": {
+      "binary": {
+        "path": "vale-ls"
+      }
+    },
+
     "tombi": {
       "binary": {
         "path": "tombi",
         "arguments": ["lsp"]
+      }
+    },
+
+    "nu": {
+      "binary": {
+        "path": "nu",
+        "arguments": ["--lsp"]
+      }
+    },
+
+    "nu-lint": {
+      "binary": {
+        "path": "nu-lint",
+        "arguments": ["--lsp", "--config", ".nu-lint.toml"]
       }
     },
 

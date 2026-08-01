@@ -14,14 +14,14 @@ runs:
       uses: nixbuild/nix-quick-install-action@9f63be77f412a248c9d9a65a4c82cf066cdf8f0c # v35
 
     - name: Cache Nix
-      uses: DuskSystems/nix-cache-action@dfb0f60031b8762e2211da4c65f3da96e5a8727e # v1.4.1
+      uses: SwornSystems/nix-cache-action@d55ba40f70dcccfb4597274644e4363b9fbd3d63 # v1.5.0
       with:
         key: nix-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/flake.lock', '**/*.nix') }}
         restore-keys: |
           nix-${{ runner.os }}-${{ runner.arch }}-
 
     - name: Configure SCCache
-      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
       with:
         script: |
           core.exportVariable('ACTIONS_RESULTS_URL', process.env.ACTIONS_RESULTS_URL);

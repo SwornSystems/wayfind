@@ -64,7 +64,7 @@ pub(crate) struct Data<T> {
 pub(crate) enum SearchMode {
     /// All children are whole segments.
     Segment,
-    /// Children may have inline suffixes.
+    /// Children can have inline suffixes.
     Inline,
 }
 
@@ -113,7 +113,7 @@ impl<S, T> Node<S, T> {
         }
 
         let length = path.len() - offset;
-        if length < self.bounds.shortest() || length > self.bounds.longest() {
+        if length < self.bounds.lower() || length > self.bounds.upper() {
             return None;
         }
 
@@ -194,7 +194,7 @@ impl<S, T> Node<S, T> {
                 },
             };
 
-            if remaining.len() - limit < child.bounds.shortest() {
+            if remaining.len() - limit < child.bounds.lower() {
                 ctx.lower(id, offset);
                 continue;
             }
@@ -231,7 +231,7 @@ impl<S, T> Node<S, T> {
         for child in &self.dynamic_children {
             let id = child.state.id;
 
-            if remaining.len() <= child.bounds.shortest() {
+            if remaining.len() <= child.bounds.lower() {
                 ctx.lower(id, offset);
                 continue;
             }
@@ -241,7 +241,7 @@ impl<S, T> Node<S, T> {
                 continue;
             }
 
-            let max = remaining.len() - child.bounds.shortest();
+            let max = remaining.len() - child.bounds.lower();
             let bound = ctx.cap(id, offset, max);
 
             let window = (bound + 1).min(remaining.len());
@@ -272,7 +272,7 @@ impl<S, T> Node<S, T> {
                 },
             };
 
-            if remaining.len() - limit < child.bounds.shortest() {
+            if remaining.len() - limit < child.bounds.lower() {
                 ctx.lower(id, offset);
                 continue;
             }
@@ -304,7 +304,7 @@ impl<S, T> Node<S, T> {
         for child in &self.wildcard_children {
             let id = child.state.id;
 
-            if remaining.len() <= child.bounds.shortest() {
+            if remaining.len() <= child.bounds.lower() {
                 ctx.lower(id, offset);
                 continue;
             }
@@ -314,7 +314,7 @@ impl<S, T> Node<S, T> {
                 continue;
             }
 
-            let max = remaining.len() - child.bounds.shortest();
+            let max = remaining.len() - child.bounds.lower();
             let cap = ctx.cap(id, offset, max);
             let upper = (cap + 1).min(remaining.len());
 
@@ -359,7 +359,7 @@ impl<S, T> Node<S, T> {
         for child in &self.wildcard_children {
             let id = child.state.id;
 
-            if remaining.len() <= child.bounds.shortest() {
+            if remaining.len() <= child.bounds.lower() {
                 ctx.lower(id, offset);
                 continue;
             }
@@ -369,7 +369,7 @@ impl<S, T> Node<S, T> {
                 continue;
             }
 
-            let max = remaining.len() - child.bounds.shortest();
+            let max = remaining.len() - child.bounds.lower();
             let cap = ctx.cap(id, offset, max);
 
             for position in child.suffixes.positions(path, offset, cap) {

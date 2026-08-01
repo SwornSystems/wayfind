@@ -6,7 +6,7 @@
 //!
 //! ### Static
 //!
-//! Static template parts are treated as-is.
+//! Static template parts match as-is.
 //!
 //! - No percent-decoding occurs.
 //! - Templates are case-sensitive.
@@ -119,8 +119,8 @@
 //!
 //! ## Display
 //!
-//! The router can be printed as a tree, via a [`Display`](core::fmt::Display)
-//! implementation.
+//! A [`Display`](core::fmt::Display) implementation prints the router as a
+//! tree.
 
 #![no_std]
 extern crate alloc;

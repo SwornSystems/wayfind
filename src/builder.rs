@@ -27,7 +27,8 @@ impl<T> RouterBuilder<T> {
     ///
     /// # Errors
     ///
-    /// When the template is malformed or conflicts with an existing route.
+    /// When the template has invalid syntax or conflicts with an existing
+    /// route.
     ///
     /// # Examples
     ///

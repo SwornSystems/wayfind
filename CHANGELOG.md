@@ -5,42 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.3](https://github.com/DuskSystems/wayfind/compare/v1.0.2...v1.0.3) - 2026-06-13
+## [1.0.3](https://github.com/SwornSystems/wayfind/compare/v1.0.2...v1.0.3) - 2026-06-13
 
 ### Fixes
-- Correct suffix boundaries order ([d338916](https://github.com/DuskSystems/wayfind/commit/d338916b0ea3d67dc84ad6790e4d4bb0458dcfbb))
+- Correct suffix boundaries order ([d338916](https://github.com/SwornSystems/wayfind/commit/d338916b0ea3d67dc84ad6790e4d4bb0458dcfbb))
 
 ### Performance
-- Only memoize revisitable parameters ([4579fda](https://github.com/DuskSystems/wayfind/commit/4579fdaeead2b62b510a156328ea5468acc483a8))
+- Only memoize revisitable parameters ([4579fda](https://github.com/SwornSystems/wayfind/commit/4579fdaeead2b62b510a156328ea5468acc483a8))
 
 ### Testing
-- Add inline wildcard coverage ([0536003](https://github.com/DuskSystems/wayfind/commit/0536003f9bb38b9d3b4bf6f0d3509b1e91ea099c))
+- Add inline wildcard coverage ([0536003](https://github.com/SwornSystems/wayfind/commit/0536003f9bb38b9d3b4bf6f0d3509b1e91ea099c))
 
-## [1.0.2](https://github.com/DuskSystems/wayfind/compare/v1.0.1...v1.0.2) - 2026-06-10
+## [1.0.2](https://github.com/SwornSystems/wayfind/compare/v1.0.1...v1.0.2) - 2026-06-10
 
 ### Fixes
-- Correct handling of overlapping suffixes ([91030c7](https://github.com/DuskSystems/wayfind/commit/91030c774dfe1b3c544c6d83a599c00266991df8))
+- Correct handling of overlapping suffixes ([91030c7](https://github.com/SwornSystems/wayfind/commit/91030c774dfe1b3c544c6d83a599c00266991df8))
 
 ### Performance
-- Replace SmallVec with custom storage ([3680375](https://github.com/DuskSystems/wayfind/commit/368037517939c282ef4f106026089b939c1c49db))
-- Use smallvec for caps ([2e926f7](https://github.com/DuskSystems/wayfind/commit/2e926f7b878f7e909135c8b8a52359ef24e74228))
-- Index search memos by ID ([0820f14](https://github.com/DuskSystems/wayfind/commit/0820f146e6fd1c53640369031baabc7a3cb66ee3))
+- Replace SmallVec with custom storage ([3680375](https://github.com/SwornSystems/wayfind/commit/368037517939c282ef4f106026089b939c1c49db))
+- Use smallvec for caps ([2e926f7](https://github.com/SwornSystems/wayfind/commit/2e926f7b878f7e909135c8b8a52359ef24e74228))
+- Index search memos by ID ([0820f14](https://github.com/SwornSystems/wayfind/commit/0820f146e6fd1c53640369031baabc7a3cb66ee3))
 
 ### Testing
-- Add overlapping suffix edge case ([3e51a65](https://github.com/DuskSystems/wayfind/commit/3e51a6556291fa295998ebcdbb461092f371b800))
+- Add overlapping suffix edge case ([3e51a65](https://github.com/SwornSystems/wayfind/commit/3e51a6556291fa295998ebcdbb461092f371b800))
 
-## [1.0.1](https://github.com/DuskSystems/wayfind/compare/v1.0.0...v1.0.1) - 2026-05-11
+## [1.0.1](https://github.com/SwornSystems/wayfind/compare/v1.0.0...v1.0.1) - 2026-05-11
 
 ### Performance
-- Smarter reachability pruning ([9b29851](https://github.com/DuskSystems/wayfind/commit/9b2985168a31671218f8bb59a063a86c028211e7))
+- Smarter reachability pruning ([9b29851](https://github.com/SwornSystems/wayfind/commit/9b2985168a31671218f8bb59a063a86c028211e7))
 
-## [1.0.0](https://github.com/DuskSystems/wayfind/compare/v0.9.1...v1.0.0) - 2026-04-04
+## [1.0.0](https://github.com/SwornSystems/wayfind/compare/v0.9.1...v1.0.0) - 2026-04-04
 
 ### Other
 
 - Bump major version
 
-## [0.9.1](https://github.com/DuskSystems/wayfind/compare/v0.9.0...v0.9.1) - 2026-04-04
+## [0.9.1](https://github.com/SwornSystems/wayfind/compare/v0.9.0...v0.9.1) - 2026-04-04
 
 ### Added
 
@@ -230,14 +230,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of `wayfind`.
 
-[0.9.0]: https://github.com/DuskSystems/wayfind/compare/v0.8.1...v0.9.0
-[0.8.1]: https://github.com/DuskSystems/wayfind/compare/v0.8.0...v0.8.1
-[0.8.0]: https://github.com/DuskSystems/wayfind/compare/v0.7.0...v0.8.0
-[0.7.0]: https://github.com/DuskSystems/wayfind/compare/v0.6.0...v0.7.0
-[0.6.0]: https://github.com/DuskSystems/wayfind/compare/v0.5.0...v0.6.0
-[0.5.0]: https://github.com/DuskSystems/wayfind/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/DuskSystems/wayfind/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/DuskSystems/wayfind/compare/v0.2.1...v0.3.0
-[0.2.1]: https://github.com/DuskSystems/wayfind/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/DuskSystems/wayfind/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/DuskSystems/wayfind/releases/tag/v0.1.0
+[0.9.0]: https://github.com/SwornSystems/wayfind/compare/v0.8.1...v0.9.0
+[0.8.1]: https://github.com/SwornSystems/wayfind/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/SwornSystems/wayfind/compare/v0.7.0...v0.8.0
+[0.7.0]: https://github.com/SwornSystems/wayfind/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/SwornSystems/wayfind/compare/v0.5.0...v0.6.0
+[0.5.0]: https://github.com/SwornSystems/wayfind/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/SwornSystems/wayfind/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/SwornSystems/wayfind/compare/v0.2.1...v0.3.0
+[0.2.1]: https://github.com/SwornSystems/wayfind/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/SwornSystems/wayfind/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/SwornSystems/wayfind/releases/tag/v0.1.0

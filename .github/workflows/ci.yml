@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -40,7 +40,7 @@ jobs:
       actions: write # sccache
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -50,7 +50,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Run checks
-        run: ./scripts/checks.sh
+        run: ./scripts/checks.nu
 
   compatibility:
     name: Compatibility
@@ -60,7 +60,7 @@ jobs:
       actions: write # sccache
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -68,7 +68,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build
-        run: ./scripts/compatibility.sh
+        run: ./scripts/compatibility.nu
 
   coverage:
     name: Coverage
@@ -76,9 +76,10 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       actions: write # sccache
+      id-token: write # codecov
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -86,14 +87,14 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Generate coverage
-        run: ./scripts/coverage.sh
+        run: ./scripts/coverage.nu
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           files: codecov.json
           fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }} # zizmor: ignore[secrets-outside-env]
+          use_oidc: true
 
   docs:
     name: Docs
@@ -109,7 +110,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -117,7 +118,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build docs
-        run: ./scripts/docs.sh
+        run: ./scripts/docs.nu
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
@@ -136,7 +137,7 @@ jobs:
       actions: write # sccache
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -144,7 +145,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Run fuzzing
-        run: ./scripts/fuzz.sh
+        run: ./scripts/fuzz.nu
 
       - name: Upload artifacts
         if: failure()
@@ -162,7 +163,7 @@ jobs:
       id-token: write # codspeed
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -170,10 +171,10 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build benchmarks
-        run: ./scripts/bench-build.sh
+        run: ./scripts/bench-build.nu
 
       - name: Run benchmarks
-        uses: CodSpeedHQ/action@4e969336ab9acd4f6f8d025fdd793292b0835df0 # v4.18.2
+        uses: CodSpeedHQ/action@f99becdce5e5d51fd556489ebef684f4ecfd6286 # v4.18.5
         with:
           mode: simulation,memory
-          run: ./scripts/bench-run.sh
+          run: ./scripts/bench-run.nu

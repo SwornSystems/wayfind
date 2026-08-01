@@ -17,6 +17,9 @@ corpus
 artifacts
 fuzz-*.log
 
+# Lychee
+.lycheecache
+
 # Nix
 result
 result-*
