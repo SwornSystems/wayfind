@@ -7,7 +7,7 @@ runs:
     - name: Host info
       shell: bash
       run: |
-        uname --all
+        uname -a
         cat /proc/cpuinfo
 
     - name: Install Nix
