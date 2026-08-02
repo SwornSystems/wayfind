@@ -36,6 +36,8 @@ unused = "allow" # Prefer `cargo-shear`
 
 # https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html#the-build-field-optional
 [bans.build]
+executables = "deny"
+interpreted = "deny"
 allow-build-scripts = []
 
 # https://embarkstudios.github.io/cargo-deny/checks/sources/cfg.html
