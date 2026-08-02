@@ -1,7 +1,7 @@
 # https://tombi-toml.github.io/tombi/docs/configuration
 
-[lint.rules]
-tables-out-of-order = "off"
-
 [lsp]
 formatting.enabled = false
+
+[lint.rules]
+tables-out-of-order = "off"
