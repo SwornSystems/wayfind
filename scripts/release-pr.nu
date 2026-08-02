@@ -1,4 +1,5 @@
-#!/usr/bin/env -S nix develop --command nu
+#!/usr/bin/env nix
+#!nix develop --command nu
 
 # Open a release pull request.
 def main []: nothing -> nothing {

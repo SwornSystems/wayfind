@@ -1,4 +1,5 @@
-#!/usr/bin/env -S nix develop .#ci-compatibility --command nu
+#!/usr/bin/env nix
+#!nix develop .#ci-compatibility --command nu
 
 # Build for the compatibility targets.
 def main []: nothing -> nothing {

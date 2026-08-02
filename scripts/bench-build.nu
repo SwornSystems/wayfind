@@ -1,4 +1,5 @@
-#!/usr/bin/env -S nix develop .#ci --command nu
+#!/usr/bin/env nix
+#!nix develop .#ci --command nu
 
 # Build the benchmarks.
 def main []: nothing -> nothing {
