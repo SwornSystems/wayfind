@@ -72,12 +72,13 @@ pub(crate) enum SearchMode {
 #[derive(Clone, Debug)]
 pub(crate) struct Node<S, T> {
     pub state: S,
-    pub data: Option<Data<T>>,
+    pub data: Option<Box<Data<T>>>,
 
     pub static_children: Box<[Node<StaticState, T>]>,
+    pub static_first_bytes: Box<[u8]>,
     pub dynamic_children: Box<[Node<DynamicState, T>]>,
     pub wildcard_children: Box<[Node<WildcardState, T>]>,
-    pub end_wildcard: Option<EndWildcardState<T>>,
+    pub end_wildcard: Option<Box<EndWildcardState<T>>>,
 
     pub bounds: Bounds,
     pub reachable: Reachable,
@@ -85,15 +86,12 @@ pub(crate) struct Node<S, T> {
 
     pub dynamic_search: SearchMode,
     pub wildcard_search: SearchMode,
+
+    pub parameterized: bool,
+    pub segments: bool,
 }
 
 impl<S, T> Node<S, T> {
-    pub(crate) fn has_parameters(&self) -> bool {
-        !self.dynamic_children.is_empty()
-            || !self.wildcard_children.is_empty()
-            || self.end_wildcard.is_some()
-    }
-
     pub(crate) fn search<'r, 'p>(
         &'r self,
         ctx: &mut SearchContext<'r, 'p>,
@@ -108,8 +106,12 @@ impl<S, T> Node<S, T> {
         path: &'p str,
         offset: usize,
     ) -> Option<&'r Data<T>> {
+        if self.segments {
+            return self.search_segments(ctx, path, offset);
+        }
+
         if offset == path.len() {
-            return self.data.as_ref();
+            return self.data.as_deref();
         }
 
         let length = path.len() - offset;
@@ -117,11 +119,13 @@ impl<S, T> Node<S, T> {
             return None;
         }
 
-        if let Some(result) = self.search_static(ctx, path, offset) {
-            return Some(result);
+        if !self.static_first_bytes.is_empty() {
+            if let Some(result) = self.search_static(ctx, path, offset) {
+                return Some(result);
+            }
         }
 
-        if !self.has_parameters() || !path.is_char_boundary(offset) {
+        if !self.parameterized || !path.is_char_boundary(offset) {
             return None;
         }
 
@@ -152,25 +156,108 @@ impl<S, T> Node<S, T> {
         path: &'p str,
         offset: usize,
     ) -> Option<&'r Data<T>> {
-        let remaining = &path.as_bytes()[offset..];
+        let (mut child, mut offset) = self.static_candidate(path, offset)?;
 
-        for child in &self.static_children {
-            if remaining.len() >= child.state.prefix.len()
-                && child
-                    .state
-                    .prefix
-                    .iter()
-                    .zip(remaining)
-                    .all(|(a, b)| a == b)
-            {
-                let end = offset + child.state.prefix.len();
-                if let Some(data) = child.search_at(ctx, path, end) {
-                    return Some(data);
+        while offset < path.len() {
+            if child.parameterized {
+                return child.search_at(ctx, path, offset);
+            }
+
+            (child, offset) = child.static_candidate(path, offset)?;
+        }
+
+        child.data.as_deref()
+    }
+
+    fn search_segments<'r, 'p>(
+        &'r self,
+        ctx: &mut SearchContext<'r, 'p>,
+        path: &'p str,
+        offset: usize,
+    ) -> Option<&'r Data<T>> {
+        if offset == path.len() {
+            return self.data.as_deref();
+        }
+
+        let length = path.len() - offset;
+        if length < self.bounds.lower() || length > self.bounds.upper() {
+            return None;
+        }
+
+        if !self.static_first_bytes.is_empty() {
+            if let Some((mut child, mut end)) = self.static_candidate(path, offset) {
+                let found = loop {
+                    if end == path.len() {
+                        break child.data.as_deref();
+                    }
+
+                    if child.parameterized {
+                        break child.search_segments(ctx, path, end);
+                    }
+
+                    match child.static_candidate(path, end) {
+                        Some(next) => (child, end) = next,
+                        None => break None,
+                    }
+                };
+
+                if found.is_some() {
+                    return found;
                 }
             }
         }
 
+        if !self.parameterized || !path.is_char_boundary(offset) {
+            return None;
+        }
+
+        let remaining = &path.as_bytes()[offset..];
+        let limit = match memchr::memchr(b'/', remaining) {
+            Some(0) => return None,
+            Some(limit) => limit,
+            None => remaining.len(),
+        };
+
+        let boundary = offset + limit;
+        for child in &self.dynamic_children {
+            if remaining.len() - limit < child.bounds.lower() {
+                continue;
+            }
+
+            ctx.parameters
+                .push((&child.state.name, &path[offset..boundary]));
+
+            if let Some(result) = child.search_segments(ctx, path, boundary) {
+                return Some(result);
+            }
+
+            ctx.parameters.pop();
+        }
+
         None
+    }
+
+    fn static_candidate(
+        &self,
+        path: &str,
+        offset: usize,
+    ) -> Option<(&Node<StaticState, T>, usize)> {
+        let remaining = &path.as_bytes()[offset..];
+        let first = remaining.first()?;
+
+        let index = self
+            .static_first_bytes
+            .iter()
+            .position(|byte| byte == first)?;
+
+        let child = self.static_children.get(index)?;
+        let prefix = &child.state.prefix;
+
+        if remaining.len() < prefix.len() || prefix.iter().zip(remaining).any(|(a, b)| a != b) {
+            return None;
+        }
+
+        Some((child, offset + prefix.len()))
     }
 
     fn search_dynamic_segment<'r, 'p>(
@@ -195,11 +282,6 @@ impl<S, T> Node<S, T> {
             };
 
             if remaining.len() - limit < child.bounds.lower() {
-                ctx.lower(id, offset);
-                continue;
-            }
-
-            if !child.reachable.check(&mut ctx.needles, path, offset) {
                 ctx.lower(id, offset);
                 continue;
             }
@@ -397,7 +479,7 @@ impl<S, T> Node<S, T> {
         path: &'p str,
         offset: usize,
     ) -> Option<&'r Data<T>> {
-        let child = self.end_wildcard.as_ref()?;
+        let child = self.end_wildcard.as_deref()?;
         ctx.parameters.push((&child.name, &path[offset..]));
         Some(&child.data)
     }
