@@ -99,6 +99,11 @@ impl Compiler {
                 .then_with(|| a.state.name.cmp(&b.state.name))
         });
 
+        let static_first_bytes = static_children
+            .iter()
+            .filter_map(|child| child.state.prefix.first().copied())
+            .collect();
+
         let dynamic_search = if dynamic_inline {
             SearchMode::Inline
         } else {
@@ -111,11 +116,16 @@ impl Compiler {
             SearchMode::Segment
         };
 
+        let parameterized = !dynamic_children.is_empty()
+            || !wildcard_children.is_empty()
+            || builder.end_wildcard.is_some();
+
         let mut node = Node {
             state: builder.state,
             data: builder.data,
 
             static_children: static_children.into_boxed_slice(),
+            static_first_bytes,
             dynamic_children: dynamic_children.into_boxed_slice(),
             wildcard_children: wildcard_children.into_boxed_slice(),
             end_wildcard: builder.end_wildcard,
@@ -126,6 +136,8 @@ impl Compiler {
 
             dynamic_search,
             wildcard_search,
+
+            parameterized,
         };
 
         node.bounds = Bounds::compute(&node);
