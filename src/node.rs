@@ -75,6 +75,7 @@ pub(crate) struct Node<S, T> {
     pub data: Option<Data<T>>,
 
     pub static_children: Box<[Node<StaticState, T>]>,
+    pub static_first_bytes: Box<[u8]>,
     pub dynamic_children: Box<[Node<DynamicState, T>]>,
     pub wildcard_children: Box<[Node<WildcardState, T>]>,
     pub end_wildcard: Option<EndWildcardState<T>>,
@@ -85,15 +86,11 @@ pub(crate) struct Node<S, T> {
 
     pub dynamic_search: SearchMode,
     pub wildcard_search: SearchMode,
+
+    pub parameterized: bool,
 }
 
 impl<S, T> Node<S, T> {
-    pub(crate) fn has_parameters(&self) -> bool {
-        !self.dynamic_children.is_empty()
-            || !self.wildcard_children.is_empty()
-            || self.end_wildcard.is_some()
-    }
-
     pub(crate) fn search<'r, 'p>(
         &'r self,
         ctx: &mut SearchContext<'r, 'p>,
@@ -121,7 +118,7 @@ impl<S, T> Node<S, T> {
             return Some(result);
         }
 
-        if !self.has_parameters() || !path.is_char_boundary(offset) {
+        if !self.parameterized || !path.is_char_boundary(offset) {
             return None;
         }
 
@@ -152,25 +149,45 @@ impl<S, T> Node<S, T> {
         path: &'p str,
         offset: usize,
     ) -> Option<&'r Data<T>> {
-        let remaining = &path.as_bytes()[offset..];
+        let (mut child, mut offset) = self.static_candidate(path, offset)?;
 
-        for child in &self.static_children {
-            if remaining.len() >= child.state.prefix.len()
-                && child
-                    .state
-                    .prefix
-                    .iter()
-                    .zip(remaining)
-                    .all(|(a, b)| a == b)
-            {
-                let end = offset + child.state.prefix.len();
-                if let Some(data) = child.search_at(ctx, path, end) {
-                    return Some(data);
-                }
+        while offset < path.len() {
+            let length = path.len() - offset;
+            if length < child.bounds.lower() || length > child.bounds.upper() {
+                return None;
             }
+
+            if child.parameterized {
+                return child.search_at(ctx, path, offset);
+            }
+
+            (child, offset) = child.static_candidate(path, offset)?;
         }
 
-        None
+        child.data.as_ref()
+    }
+
+    fn static_candidate(
+        &self,
+        path: &str,
+        offset: usize,
+    ) -> Option<(&Node<StaticState, T>, usize)> {
+        let remaining = &path.as_bytes()[offset..];
+        let first = remaining.first()?;
+
+        let index = self
+            .static_first_bytes
+            .iter()
+            .position(|byte| byte == first)?;
+
+        let child = self.static_children.get(index)?;
+        let prefix = &child.state.prefix;
+
+        if remaining.len() < prefix.len() || prefix.iter().zip(remaining).any(|(a, b)| a != b) {
+            return None;
+        }
+
+        Some((child, offset + prefix.len()))
     }
 
     fn search_dynamic_segment<'r, 'p>(
@@ -195,11 +212,6 @@ impl<S, T> Node<S, T> {
             };
 
             if remaining.len() - limit < child.bounds.lower() {
-                ctx.lower(id, offset);
-                continue;
-            }
-
-            if !child.reachable.check(&mut ctx.needles, path, offset) {
                 ctx.lower(id, offset);
                 continue;
             }
