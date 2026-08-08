@@ -14,15 +14,13 @@ concurrency:
 
 permissions: {}
 
-env:
-  ACTIONS_CACHE_SERVICE_V2: "on"
-  SCCACHE_GHA_ENABLED: "true"
-  SCCACHE_GHA_VERSION: "1"
-
 jobs:
   setup:
     name: Setup
-    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        runner: [ubuntu-24.04, ubicloud-standard-4]
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -157,7 +155,7 @@ jobs:
   benches:
     name: Benchmarks
     needs: setup
-    runs-on: ubuntu-24.04
+    runs-on: ubicloud-standard-4
     permissions:
       actions: write # sccache
       id-token: write # codspeed

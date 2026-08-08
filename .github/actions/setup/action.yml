@@ -16,16 +16,26 @@ runs:
     - name: Cache Nix
       uses: SwornSystems/nix-cache-action@d55ba40f70dcccfb4597274644e4363b9fbd3d63 # v1.5.0
       with:
-        key: nix-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/flake.lock', '**/*.nix') }}
+        key: nix-${{ runner.environment }}-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/flake.lock', '**/*.nix') }}
         restore-keys: |
-          nix-${{ runner.os }}-${{ runner.arch }}-
+          nix-${{ runner.environment }}-${{ runner.os }}-${{ runner.arch }}-
 
     - name: Configure SCCache
       uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+      env:
+        RUNNER_ENVIRONMENT: ${{ runner.environment }}
       with:
         script: |
           core.exportVariable('ACTIONS_RESULTS_URL', process.env.ACTIONS_RESULTS_URL);
           core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN);
+          core.exportVariable('SCCACHE_GHA_ENABLED', 'true');
+          core.exportVariable('SCCACHE_GHA_VERSION', `${process.env.RUNNER_ENVIRONMENT}-1`);
+
+          if (process.env.RUNNER_ENVIRONMENT === 'github-hosted') {
+            core.exportVariable('ACTIONS_CACHE_SERVICE_V2', 'on');
+          } else {
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL);
+          }
 
     - name: Build shells
       shell: bash
