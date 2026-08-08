@@ -111,6 +111,10 @@ impl Compiler {
             SearchMode::Segment
         };
 
+        let parameterized = !dynamic_children.is_empty()
+            || !wildcard_children.is_empty()
+            || builder.end_wildcard.is_some();
+
         let mut node = Node {
             state: builder.state,
             data: builder.data,
@@ -126,6 +130,7 @@ impl Compiler {
 
             dynamic_search,
             wildcard_search,
+            parameterized,
         };
 
         node.bounds = Bounds::compute(&node);

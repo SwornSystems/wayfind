@@ -85,15 +85,10 @@ pub(crate) struct Node<S, T> {
 
     pub dynamic_search: SearchMode,
     pub wildcard_search: SearchMode,
+    pub parameterized: bool,
 }
 
 impl<S, T> Node<S, T> {
-    pub(crate) fn has_parameters(&self) -> bool {
-        !self.dynamic_children.is_empty()
-            || !self.wildcard_children.is_empty()
-            || self.end_wildcard.is_some()
-    }
-
     pub(crate) fn search<'r, 'p>(
         &'r self,
         ctx: &mut SearchContext<'r, 'p>,
@@ -121,7 +116,7 @@ impl<S, T> Node<S, T> {
             return Some(result);
         }
 
-        if !self.has_parameters() || !path.is_char_boundary(offset) {
+        if !self.parameterized || !path.is_char_boundary(offset) {
             return None;
         }
 

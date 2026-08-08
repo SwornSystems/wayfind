@@ -70,7 +70,7 @@ impl Bounds {
 
     fn compute_upper<S, T>(node: &Node<S, T>) -> usize {
         // Parameters can consume any input.
-        if node.has_parameters() {
+        if node.parameterized {
             return usize::MAX;
         }
 
