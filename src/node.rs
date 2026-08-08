@@ -75,6 +75,7 @@ pub(crate) struct Node<S, T> {
     pub data: Option<Data<T>>,
 
     pub static_children: Box<[Node<StaticState, T>]>,
+    pub static_first_bytes: Box<[u8]>,
     pub dynamic_children: Box<[Node<DynamicState, T>]>,
     pub wildcard_children: Box<[Node<WildcardState, T>]>,
     pub end_wildcard: Option<EndWildcardState<T>>,
@@ -117,8 +118,10 @@ impl<S, T> Node<S, T> {
             return None;
         }
 
-        if let Some(result) = self.search_static(ctx, path, offset) {
-            return Some(result);
+        if !self.static_first_bytes.is_empty() {
+            if let Some(result) = self.search_static(ctx, path, offset) {
+                return Some(result);
+            }
         }
 
         if !self.has_parameters() || !path.is_char_boundary(offset) {
@@ -153,24 +156,21 @@ impl<S, T> Node<S, T> {
         offset: usize,
     ) -> Option<&'r Data<T>> {
         let remaining = &path.as_bytes()[offset..];
+        let first = remaining.first()?;
 
-        for child in &self.static_children {
-            if remaining.len() >= child.state.prefix.len()
-                && child
-                    .state
-                    .prefix
-                    .iter()
-                    .zip(remaining)
-                    .all(|(a, b)| a == b)
-            {
-                let end = offset + child.state.prefix.len();
-                if let Some(data) = child.search_at(ctx, path, end) {
-                    return Some(data);
-                }
-            }
+        let index = self
+            .static_first_bytes
+            .iter()
+            .position(|byte| byte == first)?;
+
+        let child = self.static_children.get(index)?;
+        let prefix = &child.state.prefix;
+
+        if remaining.len() < prefix.len() || prefix.iter().zip(remaining).any(|(a, b)| a != b) {
+            return None;
         }
 
-        None
+        child.search_at(ctx, path, offset + prefix.len())
     }
 
     fn search_dynamic_segment<'r, 'p>(
