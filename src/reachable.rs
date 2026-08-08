@@ -113,7 +113,7 @@ impl Reachable {
         prefix.extend_from_slice(&node.state.prefix);
 
         let has_data = node.data.is_some();
-        let has_params = node.has_parameters();
+        let has_params = node.parameterized;
 
         // Top level parameters can't be pruned.
         if has_params && prefix.len() <= 1 {

@@ -105,7 +105,7 @@ impl Suffixes {
         let start = prefix.len();
         prefix.extend_from_slice(&node.state.prefix);
 
-        let is_terminal = node.data.is_some() || node.has_parameters();
+        let is_terminal = node.data.is_some() || node.parameterized;
         if is_terminal {
             seen.insert(prefix.clone());
         }
