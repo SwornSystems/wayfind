@@ -194,11 +194,6 @@ impl<S, T> Node<S, T> {
                 continue;
             }
 
-            if !child.reachable.check(&mut ctx.needles, path, offset) {
-                ctx.lower(id, offset);
-                continue;
-            }
-
             let boundary = offset + limit;
             ctx.parameters
                 .push((&child.state.name, &path[offset..boundary]));
