@@ -7,5 +7,5 @@ def main []: nothing -> nothing {
         CARGO_PROFILE_DEV_CODEGEN_BACKEND: llvm
     }
 
-    cargo codspeed run --workspace
+    exec cargo codspeed run --workspace
 }
