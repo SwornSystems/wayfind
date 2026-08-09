@@ -28,12 +28,14 @@ impl fmt::Display for RootState {
 pub(crate) struct StaticState {
     /// Might not be valid UTF-8 due to multibyte splitting.
     pub prefix: Box<[u8]>,
+    pub first: u8,
 }
 
 impl StaticState {
     pub(crate) fn new(prefix: &[u8]) -> Self {
         Self {
             prefix: prefix.into(),
+            first: prefix.first().copied().unwrap_or_default(),
         }
     }
 }
