@@ -4,6 +4,8 @@ use core::fmt;
 use core::num::NonZeroUsize;
 
 use crate::node::Data;
+use crate::reachable::Reachable;
+use crate::suffixes::Suffixes;
 
 /// Root node of the tree.
 #[derive(Clone, Debug)]
@@ -47,6 +49,8 @@ impl fmt::Display for StaticState {
 pub(crate) struct DynamicState {
     pub id: Option<NonZeroUsize>,
     pub name: Box<str>,
+    pub suffixes: Suffixes,
+    pub reachable: Reachable,
 }
 
 impl DynamicState {
@@ -54,6 +58,8 @@ impl DynamicState {
         Self {
             id: None,
             name: name.into(),
+            suffixes: Suffixes::default(),
+            reachable: Reachable::default(),
         }
     }
 }
@@ -69,6 +75,8 @@ impl fmt::Display for DynamicState {
 pub(crate) struct WildcardState {
     pub id: Option<NonZeroUsize>,
     pub name: Box<str>,
+    pub suffixes: Suffixes,
+    pub reachable: Reachable,
 }
 
 impl WildcardState {
@@ -76,6 +84,8 @@ impl WildcardState {
         Self {
             id: None,
             name: name.into(),
+            suffixes: Suffixes::default(),
+            reachable: Reachable::default(),
         }
     }
 }

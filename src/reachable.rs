@@ -176,11 +176,11 @@ impl Reachable {
     fn parameter_groups<S, T>(node: &Node<S, T>) -> impl Iterator<Item = &[Group]> {
         node.dynamic_children
             .iter()
-            .map(|child| &*child.reachable.groups)
+            .map(|child| &*child.state.reachable.groups)
             .chain(
                 node.wildcard_children
                     .iter()
-                    .map(|child| &*child.reachable.groups),
+                    .map(|child| &*child.state.reachable.groups),
             )
             .chain(node.end_wildcard.is_some().then_some(&[] as &[Group]))
     }
