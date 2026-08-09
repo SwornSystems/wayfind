@@ -158,8 +158,13 @@ impl<S, T> Node<S, T> {
 
     fn next_static(&self, path: &str, offset: usize) -> Option<(&Node<StaticState, T>, usize)> {
         let remaining = &path.as_bytes()[offset..];
+        let first = remaining.first()?;
 
         for child in &self.static_children {
+            if child.state.first != *first {
+                continue;
+            }
+
             let prefix = &child.state.prefix;
             if remaining.len() < prefix.len() || prefix.iter().zip(remaining).any(|(a, b)| a != b) {
                 continue;
