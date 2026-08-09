@@ -147,22 +147,29 @@ impl<S, T> Node<S, T> {
         path: &'p str,
         offset: usize,
     ) -> Option<&'r Data<T>> {
+        let (mut child, mut offset) = self.next_static(path, offset)?;
+
+        while offset < path.len() {
+            if child.parameterized {
+                return child.search_at(ctx, path, offset);
+            }
+
+            (child, offset) = child.next_static(path, offset)?;
+        }
+
+        child.data.as_ref()
+    }
+
+    fn next_static(&self, path: &str, offset: usize) -> Option<(&Node<StaticState, T>, usize)> {
         let remaining = &path.as_bytes()[offset..];
 
         for child in &self.static_children {
-            if remaining.len() >= child.state.prefix.len()
-                && child
-                    .state
-                    .prefix
-                    .iter()
-                    .zip(remaining)
-                    .all(|(a, b)| a == b)
-            {
-                let end = offset + child.state.prefix.len();
-                if let Some(data) = child.search_at(ctx, path, end) {
-                    return Some(data);
-                }
+            let prefix = &child.state.prefix;
+            if remaining.len() < prefix.len() || prefix.iter().zip(remaining).any(|(a, b)| a != b) {
+                continue;
             }
+
+            return Some((child, offset + prefix.len()));
         }
 
         None
