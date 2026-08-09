@@ -72,12 +72,12 @@ pub(crate) enum SearchMode {
 #[derive(Clone, Debug)]
 pub(crate) struct Node<S, T> {
     pub state: S,
-    pub data: Option<Data<T>>,
+    pub data: Option<Box<Data<T>>>,
 
     pub static_children: Box<[Node<StaticState, T>]>,
     pub dynamic_children: Box<[Node<DynamicState, T>]>,
     pub wildcard_children: Box<[Node<WildcardState, T>]>,
-    pub end_wildcard: Option<EndWildcardState<T>>,
+    pub end_wildcard: Option<Box<EndWildcardState<T>>>,
 
     pub bounds: Bounds,
     pub reachable: Reachable,
@@ -104,7 +104,7 @@ impl<S, T> Node<S, T> {
         offset: usize,
     ) -> Option<&'r Data<T>> {
         if offset == path.len() {
-            return self.data.as_ref();
+            return self.data.as_deref();
         }
 
         let length = path.len() - offset;
@@ -387,7 +387,7 @@ impl<S, T> Node<S, T> {
         path: &'p str,
         offset: usize,
     ) -> Option<&'r Data<T>> {
-        let child = self.end_wildcard.as_ref()?;
+        let child = self.end_wildcard.as_deref()?;
         ctx.parameters.push((&child.name, &path[offset..]));
         Some(&child.data)
     }

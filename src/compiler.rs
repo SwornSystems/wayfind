@@ -117,12 +117,12 @@ impl Compiler {
 
         let mut node = Node {
             state: builder.state,
-            data: builder.data,
+            data: builder.data.map(Box::new),
 
             static_children: static_children.into_boxed_slice(),
             dynamic_children: dynamic_children.into_boxed_slice(),
             wildcard_children: wildcard_children.into_boxed_slice(),
-            end_wildcard: builder.end_wildcard,
+            end_wildcard: builder.end_wildcard.map(Box::new),
 
             bounds: Bounds::default(),
             reachable: Reachable::default(),
