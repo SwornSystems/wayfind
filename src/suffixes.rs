@@ -1,6 +1,7 @@
 use alloc::boxed::Box;
 use alloc::collections::BTreeSet;
 use alloc::vec::Vec;
+use core::num::NonZeroUsize;
 
 use memchr::memmem::FinderRev;
 
@@ -55,7 +56,7 @@ impl Suffixes {
         path: &'a str,
         offset: usize,
         cap: usize,
-    ) -> impl Iterator<Item = usize> + 'a {
+    ) -> impl Iterator<Item = NonZeroUsize> + 'a {
         let remaining = &path.as_bytes()[offset..];
         let mut limit = cap;
 
@@ -66,10 +67,10 @@ impl Suffixes {
                 .filter_map(|suffix| suffix.rfind(remaining, limit))
                 .max()?;
 
-            limit = position.checked_sub(1)?;
-            Some(position)
+            limit = position.saturating_sub(1);
+            NonZeroUsize::new(position)
         })
-        .filter(move |&position| path.is_char_boundary(offset + position))
+        .filter(move |position| path.is_char_boundary(offset + position.get()))
     }
 
     /// Computes the suffix set from a node's static descendants.

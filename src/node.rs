@@ -248,7 +248,7 @@ impl<S, T> Node<S, T> {
 
             // Try boundaries with known suffix.
             for position in child.state.suffixes.positions(path, offset, cap) {
-                let boundary = offset + position;
+                let boundary = offset + position.get();
 
                 ctx.parameters
                     .push((&child.state.name, &path[offset..boundary]));
@@ -371,7 +371,7 @@ impl<S, T> Node<S, T> {
             let cap = ctx.cap(id, offset, max);
 
             for position in child.state.suffixes.positions(path, offset, cap) {
-                let boundary = offset + position;
+                let boundary = offset + position.get();
 
                 ctx.parameters
                     .push((&child.state.name, &path[offset..boundary]));
