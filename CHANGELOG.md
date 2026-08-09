@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1](https://github.com/SwornSystems/wayfind/compare/v1.1.0...v1.1.1) - 2026-08-09
+
+### Performance
+- Store first byte inline ([b873ad4](https://github.com/SwornSystems/wayfind/commit/b873ad42d7547b3883be1874e125e77468e418e3))
+- Move suffixes and reachable into state ([be0c462](https://github.com/SwornSystems/wayfind/commit/be0c46244b938006d44ef0d0194506bc0984434f))
+- Iterative static walk ([b5a936e](https://github.com/SwornSystems/wayfind/commit/b5a936e1bbcbc4c580b142ba1f2fa7c8aaae36d3))
+- Drop reachable check from dynamic segment ([9a94881](https://github.com/SwornSystems/wayfind/commit/9a948817c1b9ea29a6a9999fc09935f984018528))
+- Pre-compute parameterized ([94f11b6](https://github.com/SwornSystems/wayfind/commit/94f11b6b12ec10c151fee2d9cd89ea739d0f91bb))
+
 ## [1.1.0](https://github.com/SwornSystems/wayfind/compare/v1.0.3...v1.1.0) - 2026-08-01
 
 ### Features
