@@ -7,10 +7,8 @@ use core::num::NonZeroUsize;
 
 use crate::bounds::Bounds;
 use crate::needle::NeedleCache;
-use crate::reachable::Reachable;
 use crate::state::{DynamicState, EndWildcardState, StaticState, WildcardState};
 use crate::storage::Storage;
-use crate::suffixes::Suffixes;
 
 /// Per-search state.
 pub(crate) struct SearchContext<'r, 'p> {
@@ -80,8 +78,6 @@ pub(crate) struct Node<S, T> {
     pub end_wildcard: Option<EndWildcardState<T>>,
 
     pub bounds: Bounds,
-    pub reachable: Reachable,
-    pub suffixes: Suffixes,
 
     pub dynamic_search: SearchMode,
     pub wildcard_search: SearchMode,
@@ -233,7 +229,7 @@ impl<S, T> Node<S, T> {
                 continue;
             }
 
-            if !child.reachable.check(&mut ctx.needles, path, offset) {
+            if !child.state.reachable.check(&mut ctx.needles, path, offset) {
                 ctx.lower(id, offset);
                 continue;
             }
@@ -246,7 +242,7 @@ impl<S, T> Node<S, T> {
             let cap = limit.unwrap_or(bound);
 
             // Try boundaries with known suffix.
-            for position in child.suffixes.positions(path, offset, cap) {
+            for position in child.state.suffixes.positions(path, offset, cap) {
                 let boundary = offset + position;
 
                 ctx.parameters
@@ -306,7 +302,7 @@ impl<S, T> Node<S, T> {
                 continue;
             }
 
-            if !child.reachable.check(&mut ctx.needles, path, offset) {
+            if !child.state.reachable.check(&mut ctx.needles, path, offset) {
                 ctx.lower(id, offset);
                 continue;
             }
@@ -322,7 +318,7 @@ impl<S, T> Node<S, T> {
 
             for position in positions.take_while(|&position| position > 0) {
                 let after = &remaining[position..];
-                if !child.suffixes.accepts(after) {
+                if !child.state.suffixes.accepts(after) {
                     continue;
                 }
 
@@ -361,7 +357,7 @@ impl<S, T> Node<S, T> {
                 continue;
             }
 
-            if !child.reachable.check(&mut ctx.needles, path, offset) {
+            if !child.state.reachable.check(&mut ctx.needles, path, offset) {
                 ctx.lower(id, offset);
                 continue;
             }
@@ -369,7 +365,7 @@ impl<S, T> Node<S, T> {
             let max = remaining.len() - child.bounds.lower();
             let cap = ctx.cap(id, offset, max);
 
-            for position in child.suffixes.positions(path, offset, cap) {
+            for position in child.state.suffixes.positions(path, offset, cap) {
                 let boundary = offset + position;
 
                 ctx.parameters

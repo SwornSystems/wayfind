@@ -63,8 +63,8 @@ impl Compiler {
                 child.state.id = NonZeroUsize::new(self.parameters);
             }
 
-            child.suffixes = Suffixes::compute(child, &mut prefix, &mut seen);
-            child.reachable = Reachable::compute(child, &mut self.needles);
+            child.state.suffixes = Suffixes::compute(child, &mut prefix, &mut seen);
+            child.state.reachable = Reachable::compute(child, &mut self.needles);
         }
 
         let mut wildcard_children: Vec<Node<WildcardState, T>> = builder
@@ -79,23 +79,25 @@ impl Compiler {
                 child.state.id = NonZeroUsize::new(self.parameters);
             }
 
-            child.suffixes = Suffixes::compute(child, &mut prefix, &mut seen);
-            child.reachable = Reachable::compute(child, &mut self.needles);
+            child.state.suffixes = Suffixes::compute(child, &mut prefix, &mut seen);
+            child.state.reachable = Reachable::compute(child, &mut self.needles);
         }
 
         static_children.sort_by(|a, b| a.state.prefix.cmp(&b.state.prefix));
 
         dynamic_children.sort_by(|a, b| {
-            b.suffixes
+            b.state
+                .suffixes
                 .longest()
-                .cmp(&a.suffixes.longest())
+                .cmp(&a.state.suffixes.longest())
                 .then_with(|| a.state.name.cmp(&b.state.name))
         });
 
         wildcard_children.sort_by(|a, b| {
-            b.suffixes
+            b.state
+                .suffixes
                 .longest()
-                .cmp(&a.suffixes.longest())
+                .cmp(&a.state.suffixes.longest())
                 .then_with(|| a.state.name.cmp(&b.state.name))
         });
 
@@ -125,8 +127,6 @@ impl Compiler {
             end_wildcard: builder.end_wildcard,
 
             bounds: Bounds::default(),
-            reachable: Reachable::default(),
-            suffixes: Suffixes::default(),
 
             dynamic_search,
             wildcard_search,
