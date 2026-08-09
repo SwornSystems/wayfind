@@ -36,7 +36,7 @@ impl Condition {
 
 /// A group of conditions that must all pass.
 #[derive(Clone, Debug)]
-struct Group {
+pub(crate) struct Group {
     conditions: Box<[Condition]>,
 }
 
@@ -56,18 +56,21 @@ impl Group {
 
 /// Pre-computed reachability conditions for a node.
 #[derive(Clone, Debug, Default)]
-pub(crate) struct Reachable {
-    groups: Box<[Group]>,
+pub(crate) enum Reachable {
+    #[default]
+    Always,
+    AnyOf(Box<[Group]>),
 }
 
 impl Reachable {
     /// Whether the remaining path could reach a match through this node.
     pub(crate) fn check(&self, needles: &mut NeedleCache, path: &str, offset: usize) -> bool {
-        self.groups.is_empty()
-            || self
-                .groups
+        match self {
+            Self::Always => true,
+            Self::AnyOf(groups) => groups
                 .iter()
-                .any(|group| group.check(needles, path, offset))
+                .any(|group| group.check(needles, path, offset)),
+        }
     }
 
     /// Computes reachability conditions for a node's subtree.
@@ -77,28 +80,25 @@ impl Reachable {
     ) -> Self {
         // Nodes with data or end wildcards are always reachable.
         if node.data.is_some() || node.end_wildcard.is_some() {
-            return Self::default();
+            return Self::Always;
         }
 
         let mut groups = Vec::new();
         let mut prefix = Vec::new();
 
         for child in &node.static_children {
-            let inner = Self::walk_static(child, &mut prefix, needles);
-            if inner.is_empty() {
-                return Self::default();
-            }
+            let Some(inner) = Self::walk_static(child, &mut prefix, needles) else {
+                return Self::Always;
+            };
 
             groups.extend(inner);
         }
 
         if groups.is_empty() {
-            return Self::default();
+            return Self::Always;
         }
 
-        Self {
-            groups: groups.into_boxed_slice(),
-        }
+        Self::AnyOf(groups.into_boxed_slice())
     }
 
     /// Walks a static subtree, returning the constraint groups it produces.
@@ -106,7 +106,7 @@ impl Reachable {
         node: &Node<StaticState, T>,
         prefix: &mut Vec<u8>,
         needles: &mut BTreeMap<Box<[u8]>, usize>,
-    ) -> Vec<Group> {
+    ) -> Option<Vec<Group>> {
         let mut groups = Vec::new();
 
         let start = prefix.len();
@@ -118,7 +118,7 @@ impl Reachable {
         // Top level parameters can't be pruned.
         if has_params && prefix.len() <= 1 {
             prefix.truncate(start);
-            return Vec::new();
+            return None;
         }
 
         if has_params {
@@ -159,28 +159,37 @@ impl Reachable {
         }
 
         for child in &node.static_children {
-            let inner = Self::walk_static(child, prefix, needles);
-            if inner.is_empty() {
+            let Some(inner) = Self::walk_static(child, prefix, needles) else {
                 prefix.truncate(start);
-                return Vec::new();
-            }
+                return None;
+            };
 
             groups.extend(inner);
         }
 
         prefix.truncate(start);
-        groups
+        if groups.is_empty() {
+            return None;
+        }
+
+        Some(groups)
     }
 
     /// Yields the reachable constraint groups of parameter children.
     fn parameter_groups<S, T>(node: &Node<S, T>) -> impl Iterator<Item = &[Group]> {
         node.dynamic_children
             .iter()
-            .map(|child| &*child.state.reachable.groups)
+            .map(|child| match &child.state.reachable {
+                Self::Always => &[],
+                Self::AnyOf(groups) => groups.as_ref(),
+            })
             .chain(
                 node.wildcard_children
                     .iter()
-                    .map(|child| &*child.state.reachable.groups),
+                    .map(|child| match &child.state.reachable {
+                        Self::Always => &[],
+                        Self::AnyOf(groups) => groups.as_ref(),
+                    }),
             )
             .chain(node.end_wildcard.is_some().then_some(&[] as &[Group]))
     }
