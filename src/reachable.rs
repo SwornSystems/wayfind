@@ -36,7 +36,7 @@ impl Condition {
 
 /// A group of conditions that must all pass.
 #[derive(Clone, Debug)]
-pub(crate) struct Group {
+struct Group {
     conditions: Box<[Condition]>,
 }
 
@@ -56,21 +56,18 @@ impl Group {
 
 /// Pre-computed reachability conditions for a node.
 #[derive(Clone, Debug, Default)]
-pub(crate) enum Reachable {
-    #[default]
-    Always,
-    AnyOf(Box<[Group]>),
+pub(crate) struct Reachable {
+    groups: Box<[Group]>,
 }
 
 impl Reachable {
     /// Whether the remaining path could reach a match through this node.
     pub(crate) fn check(&self, needles: &mut NeedleCache, path: &str, offset: usize) -> bool {
-        match self {
-            Self::Always => true,
-            Self::AnyOf(groups) => groups
+        self.groups.is_empty()
+            || self
+                .groups
                 .iter()
-                .any(|group| group.check(needles, path, offset)),
-        }
+                .any(|group| group.check(needles, path, offset))
     }
 
     /// Computes reachability conditions for a node's subtree.
@@ -80,7 +77,7 @@ impl Reachable {
     ) -> Self {
         // Nodes with data or end wildcards are always reachable.
         if node.data.is_some() || node.end_wildcard.is_some() {
-            return Self::Always;
+            return Self::default();
         }
 
         let mut groups = Vec::new();
@@ -88,17 +85,19 @@ impl Reachable {
 
         for child in &node.static_children {
             let Some(inner) = Self::walk_static(child, &mut prefix, needles) else {
-                return Self::Always;
+                return Self::default();
             };
 
             groups.extend(inner);
         }
 
         if groups.is_empty() {
-            return Self::Always;
+            return Self::default();
         }
 
-        Self::AnyOf(groups.into_boxed_slice())
+        Self {
+            groups: groups.into_boxed_slice(),
+        }
     }
 
     /// Walks a static subtree, returning the constraint groups it produces.
@@ -179,17 +178,11 @@ impl Reachable {
     fn parameter_groups<S, T>(node: &Node<S, T>) -> impl Iterator<Item = &[Group]> {
         node.dynamic_children
             .iter()
-            .map(|child| match &child.state.reachable {
-                Self::Always => &[],
-                Self::AnyOf(groups) => groups.as_ref(),
-            })
+            .map(|child| &*child.state.reachable.groups)
             .chain(
                 node.wildcard_children
                     .iter()
-                    .map(|child| match &child.state.reachable {
-                        Self::Always => &[],
-                        Self::AnyOf(groups) => groups.as_ref(),
-                    }),
+                    .map(|child| &*child.state.reachable.groups),
             )
             .chain(node.end_wildcard.is_some().then_some(&[] as &[Group]))
     }
