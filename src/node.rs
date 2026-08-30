@@ -403,6 +403,11 @@ impl<S, T> Node<S, T> {
 
 impl<S: fmt::Display, T> fmt::Display for Node<S, T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        /// Recursively writes a node and its children as an indented tree.
+        ///
+        /// # Errors
+        ///
+        /// Returns an error if writing to the formatter fails.
         fn display_node<S: fmt::Display, T>(
             f: &mut fmt::Formatter<'_>,
             node: &Node<S, T>,

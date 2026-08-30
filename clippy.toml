@@ -1,7 +1,13 @@
-# https://doc.rust-lang.org/clippy/configuration.html
+# https://doc.rust-lang.org/clippy/lint_configuration.html
+msrv = "1.85"
 
+# API
 allow-renamed-params-for = []
 avoid-breaking-exported-api = false
+check-private-items = true
+
+# Style
+enforce-iter-loop-reborrow = true
 
 # Tests
 allow-dbg-in-tests = true
@@ -11,6 +17,11 @@ allow-panic-in-tests = true
 allow-print-in-tests = true
 allow-unwrap-in-tests = true
 
+# Types
 disallowed-types = []
+
+# Methods
 disallowed-methods = []
+
+# Macros
 disallowed-macros = []

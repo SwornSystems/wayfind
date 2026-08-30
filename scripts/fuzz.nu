@@ -8,7 +8,7 @@ def main [
     load-env {
         CARGO_PROFILE_DEV_CODEGEN_BACKEND: llvm
 
-        # Must disable LTO:
+        # NOTE: Must disable LTO.
         # https://github.com/rust-fuzz/cargo-fuzz/issues/384
         CARGO_PROFILE_RELEASE_LTO: "false"
     }
@@ -16,7 +16,7 @@ def main [
     rm --recursive --force fuzz/artifacts
     rm --recursive --force fuzz/corpus
 
-    # No `--locked` support:
+    # NOTE: No `--locked` support.
     # https://github.com/rust-fuzz/cargo-fuzz/issues/312
     cargo fuzz build
 
@@ -26,17 +26,14 @@ def main [
         exit 1
     }
 
-    let jobs: int = sys cpu | length
-
     for target in ($list.stdout | lines) {
-        # Timeout: 100 µs
         (
             cargo fuzz run $target
                 --
                 -dict=fuzz/dict/wayfind.dict
-                -timeout=0.0001
-                -max_total_time=60
-                $"-fork=($jobs)"
+                -timeout=0.0001 # 100 µs
+                -max_total_time=30
+                $"-fork=(sys cpu | length)"
                 -print_final_stats=1
                 ...$args
         )

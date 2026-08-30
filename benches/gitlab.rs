@@ -1,4 +1,9 @@
-#![expect(missing_docs, clippy::unwrap_used, reason = "Bench")]
+#![expect(
+    missing_docs,
+    clippy::missing_panics_doc,
+    clippy::unwrap_used,
+    reason = "Bench"
+)]
 
 use core::hint::black_box;
 

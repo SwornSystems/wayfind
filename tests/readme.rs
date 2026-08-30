@@ -1,4 +1,9 @@
-#![expect(missing_docs, reason = "Tests")]
+#![expect(
+    missing_docs,
+    clippy::missing_errors_doc,
+    clippy::missing_panics_doc,
+    reason = "Tests"
+)]
 
 use core::error::Error;
 

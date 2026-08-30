@@ -7,5 +7,6 @@ def main []: nothing -> nothing {
         CARGO_PROFILE_DEV_CODEGEN_BACKEND: llvm
     }
 
+    # NOTE: Must not be spawned as a child, so profiling hooks can follow it.
     exec cargo codspeed run --workspace
 }

@@ -23,6 +23,10 @@ pub(crate) struct Template<'a> {
 
 impl<'a> Template<'a> {
     /// Parses a template string into its parts.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the template is invalid.
     pub(crate) fn new(template: &'a str) -> Result<Self, InsertError> {
         let input = template.as_bytes();
 
@@ -90,6 +94,11 @@ impl<'a> Template<'a> {
         (Part::Static { prefix }, end)
     }
 
+    /// Parses a single parameter, starting from its opening angle bracket.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the parameter is invalid.
     fn parse_parameter_part(
         input: &'a [u8],
         cursor: usize,

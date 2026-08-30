@@ -17,14 +17,19 @@ permissions: {}
 jobs:
   setup:
     name: Setup
+    permissions:
+      contents: read # checkout
     strategy:
       matrix:
-        runner: [ubuntu-24.04, ubicloud-standard-4]
+        runner:
+          - ubuntu-24.04
+          - ubicloud-standard-4
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Setup
@@ -35,17 +40,18 @@ jobs:
     needs: setup
     runs-on: ubuntu-24.04
     permissions:
-      actions: write # sccache
+      contents: read # checkout
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
 
       - name: Setup
         uses: ./.github/actions/setup
+        with:
+          rust: "true"
 
       - name: Run checks
         run: ./scripts/checks.nu
@@ -55,44 +61,52 @@ jobs:
     needs: setup
     runs-on: ubuntu-24.04
     permissions:
-      actions: write # sccache
+      contents: read # checkout
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Setup
         uses: ./.github/actions/setup
+        with:
+          rust: "true"
 
       - name: Build
         run: ./scripts/compatibility.nu
 
-  coverage:
-    name: Coverage
-    needs: setup
-    runs-on: ubuntu-24.04
-    permissions:
-      actions: write # sccache
-      id-token: write # codecov
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Setup
-        uses: ./.github/actions/setup
-
-      - name: Generate coverage
-        run: ./scripts/coverage.nu
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
-        with:
-          files: codecov.json
-          fail_ci_if_error: true
-          use_oidc: true
+  # NOTE: Codecov uploads are failing.
+  # https://github.com/codecov/umbrella/issues/616
+  # coverage:
+  #   name: Coverage
+  #   needs: setup
+  #   runs-on: ubuntu-24.04
+  #   permissions:
+  #     contents: read # checkout
+  #     id-token: write # codecov
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+  #       with:
+  #         fetch-depth: 0
+  #         persist-credentials: false
+  #
+  #     - name: Setup
+  #       uses: ./.github/actions/setup
+  #       with:
+  #         rust: "true"
+  #
+  #     - name: Generate coverage
+  #       run: ./scripts/ci/coverage.nu
+  #
+  #     - name: Upload coverage to Codecov
+  #       uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+  #       with:
+  #         files: codecov.json
+  #         fail_ci_if_error: true
+  #         use_oidc: true
 
   docs:
     name: Docs
@@ -100,7 +114,7 @@ jobs:
     runs-on: ubuntu-24.04
     if: github.ref == 'refs/heads/main'
     permissions:
-      actions: write # sccache
+      contents: read # checkout
       pages: write # pages
       id-token: write # pages
     environment:
@@ -110,13 +124,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Setup
         uses: ./.github/actions/setup
+        with:
+          rust: "true"
 
       - name: Build docs
-        run: ./scripts/docs.nu
+        run: ./scripts/ci/docs.nu
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
@@ -132,15 +149,18 @@ jobs:
     needs: setup
     runs-on: ubuntu-24.04
     permissions:
-      actions: write # sccache
+      contents: read # checkout
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Setup
         uses: ./.github/actions/setup
+        with:
+          rust: "true"
 
       - name: Run fuzzing
         run: ./scripts/fuzz.nu
@@ -157,24 +177,27 @@ jobs:
     needs: setup
     runs-on: ubicloud-standard-4
     permissions:
-      actions: write # sccache
+      contents: read # checkout
       id-token: write # codspeed
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Setup
         uses: ./.github/actions/setup
+        with:
+          rust: "true"
 
       - name: Build benchmarks
-        run: ./scripts/bench-build.nu
+        run: ./scripts/ci/bench-build.nu
 
       - name: Run benchmarks
-        uses: CodSpeedHQ/action@4296e51e7041e24dadb86d1d6e8b9320d223dbe8 # v5.0.3
+        uses: CodSpeedHQ/action@373d6868929f444bc08d901fd0eb0ad52a8875ea # v5.2.1
         with:
           mode: simulation,memory
           cycle-estimation: true
           exclude-allocations: true
-          run: ./scripts/bench-run.nu
+          run: ./scripts/ci/bench-run.nu

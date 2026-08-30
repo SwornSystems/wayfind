@@ -27,6 +27,6 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Release
-        run: ./scripts/release.nu
+        run: ./scripts/ci/release.nu
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}

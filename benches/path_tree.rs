@@ -1,6 +1,7 @@
 #![expect(
     missing_docs,
     clippy::let_underscore_must_use,
+    clippy::missing_panics_doc,
     clippy::unwrap_used,
     reason = "Bench"
 )]

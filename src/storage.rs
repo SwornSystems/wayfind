@@ -127,6 +127,8 @@ impl<T: Copy, const N: usize> Storage<T, N> {
 
 #[cfg(test)]
 mod tests {
+    #![expect(clippy::missing_panics_doc, reason = "Tests")]
+
     use similar_asserts::assert_eq;
 
     use super::*;
@@ -138,7 +140,7 @@ mod tests {
         assert_eq!(storage.get(0), None);
         assert_eq!(storage.get_mut(0), None);
         assert_eq!(storage.pop(), None);
-        assert!(storage.as_slice().is_empty());
+        assert_eq!(storage.as_slice(), &[]);
     }
 
     #[test]
@@ -155,7 +157,7 @@ mod tests {
         assert_eq!(storage.get(1), None);
         assert_eq!(storage.pop(), Some(1));
         assert_eq!(storage.pop(), None);
-        assert!(storage.as_slice().is_empty());
+        assert_eq!(storage.as_slice(), &[]);
     }
 
     #[test]

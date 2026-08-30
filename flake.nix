@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs = {
-      url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+      url = "github:NixOS/nixpkgs/nixos-unstable";
     };
 
     rust-overlay = {
@@ -75,6 +75,7 @@
             ];
 
             # Cargo
+            CARGO_UNSTABLE_MIN_PUBLISH_AGE = "true";
             CARGO_UNSTABLE_CODEGEN_BACKEND = "true";
             CARGO_PROFILE_DEV_CODEGEN_BACKEND = "cranelift";
             CARGO_UNSTABLE_FEATURE_UNIFICATION = "true";
@@ -99,11 +100,9 @@
                 "rustfmt"
               ];
             })
-            sccache
             cargo-codspeed
             cargo-deny
             cargo-expand
-            cargo-features-manager
             cargo-fuzz
             cargo-insta
             cargo-llvm-cov
@@ -157,13 +156,13 @@
             VALE_STYLES_PATH = "${pkgs.vale-styles}/share/vale/styles";
 
             # Rust
-            RUSTC_WRAPPER = "sccache";
             RUSTFLAGS = pkgs.lib.concatStringsSep " " [
               "-Z threads=0"
             ];
 
             # Cargo
             CARGO_INCREMENTAL = "0";
+            CARGO_UNSTABLE_MIN_PUBLISH_AGE = "true";
             CARGO_UNSTABLE_CODEGEN_BACKEND = "true";
             CARGO_PROFILE_DEV_CODEGEN_BACKEND = "cranelift";
             CARGO_UNSTABLE_FEATURE_UNIFICATION = "true";
@@ -181,7 +180,6 @@
                 "rustfmt"
               ];
             })
-            sccache
             cargo-codspeed
             cargo-deny
             cargo-fuzz
@@ -222,9 +220,6 @@
           name = "wayfind-ci-compatibility-shell";
 
           env = {
-            # Rust
-            RUSTC_WRAPPER = "sccache";
-
             # Cargo
             CARGO_INCREMENTAL = "0";
           };
@@ -237,7 +232,6 @@
                 "wasm32-unknown-unknown"
               ];
             })
-            sccache
 
             # Nushell
             nushell
