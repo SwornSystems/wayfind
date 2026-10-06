@@ -112,7 +112,7 @@ impl<S, T> Node<S, T> {
             return Some(result);
         }
 
-        if !self.parameterized || !path.is_char_boundary(offset) {
+        if !self.parameterized {
             return None;
         }
 
@@ -247,7 +247,7 @@ impl<S, T> Node<S, T> {
             let cap = limit.unwrap_or(bound);
 
             // Try boundaries with known suffix.
-            for position in child.state.suffixes.positions(path, offset, cap) {
+            for position in child.state.suffixes.positions(remaining, cap) {
                 let boundary = offset + position.get();
 
                 ctx.parameters
@@ -370,7 +370,7 @@ impl<S, T> Node<S, T> {
             let max = remaining.len() - child.bounds.lower();
             let cap = ctx.cap(id, offset, max);
 
-            for position in child.state.suffixes.positions(path, offset, cap) {
+            for position in child.state.suffixes.positions(remaining, cap) {
                 let boundary = offset + position.get();
 
                 ctx.parameters
