@@ -1,5 +1,6 @@
 use alloc::boxed::Box;
 use alloc::collections::{BTreeMap, BTreeSet};
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::num::NonZeroUsize;
 
@@ -13,7 +14,7 @@ use crate::suffixes::Suffixes;
 
 /// Compiles a builder tree into an optimized tree.
 pub(crate) struct Compiler {
-    needles: BTreeMap<Box<[u8]>, usize>,
+    needles: BTreeMap<Box<str>, usize>,
     parameters: usize,
 }
 
@@ -49,7 +50,7 @@ impl Compiler {
         let wildcard_revisitable = true;
 
         let mut seen = BTreeSet::new();
-        let mut prefix = Vec::new();
+        let mut prefix = String::new();
 
         let mut dynamic_children: Vec<Node<DynamicState, T>> = builder
             .dynamic_children

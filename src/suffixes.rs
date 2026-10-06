@@ -1,5 +1,6 @@
 use alloc::boxed::Box;
 use alloc::collections::BTreeSet;
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::num::NonZeroUsize;
 
@@ -16,12 +17,10 @@ pub(crate) struct Suffix {
 }
 
 impl Suffix {
-    fn new(bytes: Vec<u8>) -> Self {
+    fn new(suffix: String) -> Self {
+        let bytes = suffix.into_bytes().into_boxed_slice();
         let finder = FinderRev::new(&bytes).into_owned();
-        Self {
-            bytes: bytes.into_boxed_slice(),
-            finder,
-        }
+        Self { bytes, finder }
     }
 
     /// The greatest starting position not exceeding the bound.
@@ -76,8 +75,8 @@ impl Suffixes {
     /// Computes the suffix set from a node's static descendants.
     pub(crate) fn compute<S, T>(
         node: &Node<S, T>,
-        prefix: &mut Vec<u8>,
-        seen: &mut BTreeSet<Vec<u8>>,
+        prefix: &mut String,
+        seen: &mut BTreeSet<String>,
     ) -> Self {
         seen.clear();
 
@@ -100,11 +99,11 @@ impl Suffixes {
     /// that can end a route.
     fn walk_static<T>(
         node: &Node<StaticState, T>,
-        prefix: &mut Vec<u8>,
-        seen: &mut BTreeSet<Vec<u8>>,
+        prefix: &mut String,
+        seen: &mut BTreeSet<String>,
     ) {
         let start = prefix.len();
-        prefix.extend_from_slice(&node.state.prefix);
+        prefix.push_str(&node.state.prefix);
 
         let is_terminal = node.data.is_some() || node.parameterized;
         if is_terminal {

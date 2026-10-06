@@ -105,18 +105,18 @@ fn static_split_multibyte() -> Result<(), Box<dyn Error>> {
     builder.insert("/👨‍👨‍👦", 6)?; // Family: Man, Man, Boy
 
     let router = builder.build();
-    insta::assert_snapshot!(router, @r"
-    /�
-    ├─ �‍�
-    │  ├─ �‍�
-    │  │  ├─ �
-    │  │  ╰─ �
-    │  ╰─ �‍�
-    │     ├─ �
-    │     ╰─ �
-    ╰─ �‍👩‍�
-       ├─ �
-       ╰─ �
+    insta::assert_snapshot!(router, @"
+    /
+    ├─ 👨‍
+    │  ├─ 👨‍
+    │  │  ├─ 👦
+    │  │  ╰─ 👧
+    │  ╰─ 👩‍
+    │     ├─ 👦
+    │     ╰─ 👧
+    ╰─ 👩‍👩‍
+       ├─ 👦
+       ╰─ 👧
     ");
 
     let search = router.search("/👨‍👩‍👧").unwrap(); // Family: Man, Woman, Girl

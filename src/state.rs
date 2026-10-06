@@ -1,5 +1,4 @@
 use alloc::boxed::Box;
-use alloc::string::String;
 use core::fmt;
 use core::num::NonZeroUsize;
 
@@ -23,26 +22,25 @@ impl fmt::Display for RootState {
     }
 }
 
-/// A static byte prefix.
+/// A static prefix.
 #[derive(Clone, Debug)]
 pub(crate) struct StaticState {
-    /// Might not be valid UTF-8 due to multibyte splitting.
-    pub prefix: Box<[u8]>,
+    pub prefix: Box<str>,
     pub first: u8,
 }
 
 impl StaticState {
-    pub(crate) fn new(prefix: &[u8]) -> Self {
+    pub(crate) fn new(prefix: &str) -> Self {
         Self {
             prefix: prefix.into(),
-            first: prefix.first().copied().unwrap_or_default(),
+            first: prefix.bytes().next().unwrap_or_default(),
         }
     }
 }
 
 impl fmt::Display for StaticState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", String::from_utf8_lossy(&self.prefix))
+        write!(f, "{}", self.prefix)
     }
 }
 

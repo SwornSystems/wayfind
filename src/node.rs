@@ -165,7 +165,7 @@ impl<S, T> Node<S, T> {
                 continue;
             }
 
-            let prefix = &child.state.prefix;
+            let prefix = child.state.prefix.as_bytes();
             if remaining.len() < prefix.len() || prefix.iter().zip(remaining).any(|(a, b)| a != b) {
                 continue;
             }

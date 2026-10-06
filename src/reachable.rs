@@ -1,5 +1,6 @@
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
 use alloc::vec::Vec;
 
 use crate::needle::NeedleCache;
@@ -73,7 +74,7 @@ impl Reachable {
     /// Computes reachability conditions for a node's subtree.
     pub(crate) fn compute<S, T>(
         node: &Node<S, T>,
-        needles: &mut BTreeMap<Box<[u8]>, usize>,
+        needles: &mut BTreeMap<Box<str>, usize>,
     ) -> Self {
         // Nodes with data or end wildcards are always reachable.
         if node.data.is_some() || node.end_wildcard.is_some() {
@@ -81,7 +82,7 @@ impl Reachable {
         }
 
         let mut groups = Vec::new();
-        let mut prefix = Vec::new();
+        let mut prefix = String::new();
 
         for child in &node.static_children {
             let inner = Self::walk_static(child, &mut prefix, needles);
@@ -104,13 +105,13 @@ impl Reachable {
     /// Walks a static subtree, returning the constraint groups it produces.
     fn walk_static<T>(
         node: &Node<StaticState, T>,
-        prefix: &mut Vec<u8>,
-        needles: &mut BTreeMap<Box<[u8]>, usize>,
+        prefix: &mut String,
+        needles: &mut BTreeMap<Box<str>, usize>,
     ) -> Vec<Group> {
         let mut groups = Vec::new();
 
         let start = prefix.len();
-        prefix.extend_from_slice(&node.state.prefix);
+        prefix.push_str(&node.state.prefix);
 
         let has_data = node.data.is_some();
         let has_params = node.parameterized;
@@ -123,9 +124,9 @@ impl Reachable {
 
         if has_params {
             let len = needles.len();
-            let id = *needles.entry(prefix.as_slice().into()).or_insert(len);
+            let id = *needles.entry(prefix.as_str().into()).or_insert(len);
             let contains = Condition::Contains {
-                needle: prefix.as_slice().into(),
+                needle: prefix.as_bytes().into(),
                 id,
             };
 
@@ -155,7 +156,7 @@ impl Reachable {
 
         // Exact prefix match if this node has data.
         if has_data {
-            groups.push(Group::single(Condition::EndsWith(prefix.as_slice().into())));
+            groups.push(Group::single(Condition::EndsWith(prefix.as_bytes().into())));
         }
 
         for child in &node.static_children {
