@@ -52,11 +52,9 @@ impl Suffixes {
     /// Yields candidate boundary positions, walking from right to left.
     pub(crate) fn positions<'a>(
         &'a self,
-        path: &'a str,
-        offset: usize,
+        remaining: &'a [u8],
         cap: usize,
     ) -> impl Iterator<Item = NonZeroUsize> + 'a {
-        let remaining = &path.as_bytes()[offset..];
         let mut limit = cap;
 
         core::iter::from_fn(move || {
@@ -69,7 +67,6 @@ impl Suffixes {
             limit = position.saturating_sub(1);
             NonZeroUsize::new(position)
         })
-        .filter(move |position| path.is_char_boundary(offset + position.get()))
     }
 
     /// Computes the suffix set from a node's static descendants.
