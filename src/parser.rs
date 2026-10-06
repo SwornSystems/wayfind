@@ -131,7 +131,10 @@ impl<'a> Template<'a> {
             return Err(InsertError::EmptyParameter);
         }
 
-        if name.chars().any(|char| INVALID_PARAM_CHARS.contains(&char)) {
+        if name
+            .chars()
+            .any(|char| char.is_whitespace() || INVALID_PARAM_CHARS.contains(&char))
+        {
             return Err(InsertError::InvalidParameter { name: name.into() });
         }
 
@@ -223,6 +226,12 @@ mod tests {
     fn parser_error_invalid_parameter() {
         let error = Template::new("/users/<user*name>/profile").unwrap_err();
         insta::assert_snapshot!(error, @"invalid parameter name `user*name`");
+    }
+
+    #[test]
+    fn parser_error_whitespace_parameter() {
+        let error = Template::new("/users/<user name>/profile").unwrap_err();
+        insta::assert_snapshot!(error, @"invalid parameter name `user name`");
     }
 
     #[test]
