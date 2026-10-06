@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2](https://github.com/SwornSystems/wayfind/compare/v1.1.1...v1.1.2) - 2026-10-06
+
+### Fixes
+- Prevent whitespace in parameter names ([2d5c23d](https://github.com/SwornSystems/wayfind/commit/2d5c23d7f18c32de7654e7278f6ff540cf54e765))
+- Keep static prefixes as UTF-8 ([cc466c6](https://github.com/SwornSystems/wayfind/commit/cc466c692dd2b0eac26a00e1788cca59fa1f6080))
+
+### Performance
+- Skip duplicate segment end search ([5167c91](https://github.com/SwornSystems/wayfind/commit/5167c91510ff59dd20d2a500d174d91590c1c566))
+- Remove unused boundary check ([d83d1d7](https://github.com/SwornSystems/wayfind/commit/d83d1d73c6d2dd132a9dffdcfa0bf5ab2c9041b2))
+
+### Documentation
+- Clarify routing limitations ([b400eae](https://github.com/SwornSystems/wayfind/commit/b400eae9371ba72d45ebfd39249e725566726613))
+
 ## [1.1.1](https://github.com/SwornSystems/wayfind/compare/v1.1.0...v1.1.1) - 2026-08-09
 
 ### Performance
