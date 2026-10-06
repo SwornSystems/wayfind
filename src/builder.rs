@@ -113,7 +113,7 @@ impl<S, T> BuilderNode<S, T> {
             && self
                 .static_children
                 .iter()
-                .all(|child| child.state.prefix.first() == Some(&b'/'))
+                .all(|child| child.state.prefix.starts_with('/'))
     }
 
     pub(crate) fn insert(&mut self, template: &mut Template<'_>, data: Data<T>) {
@@ -132,11 +132,11 @@ impl<S, T> BuilderNode<S, T> {
         }
     }
 
-    fn insert_static(&mut self, template: &mut Template<'_>, data: Data<T>, prefix: &[u8]) {
+    fn insert_static(&mut self, template: &mut Template<'_>, data: Data<T>, prefix: &str) {
         let Some(child) = self
             .static_children
             .iter_mut()
-            .find(|child| child.state.prefix[0] == prefix[0])
+            .find(|child| child.state.prefix.chars().next() == prefix.chars().next())
         else {
             let mut new_child = BuilderNode::new(StaticState::new(prefix));
             new_child.insert(template, data);
@@ -145,11 +145,12 @@ impl<S, T> BuilderNode<S, T> {
             return;
         };
 
-        let common_prefix = prefix
-            .iter()
-            .zip(&child.state.prefix)
-            .take_while(|&(a, b)| a == b)
-            .count();
+        let common_prefix: usize = prefix
+            .chars()
+            .zip(child.state.prefix.chars())
+            .take_while(|(a, b)| a == b)
+            .map(|(char, _)| char.len_utf8())
+            .sum();
 
         if common_prefix >= child.state.prefix.len() {
             if common_prefix >= prefix.len() {
@@ -230,21 +231,15 @@ impl<S, T> BuilderNode<S, T> {
         }
     }
 
-    fn conflict_static(&self, parts: &[Part<'_>], prefix: &[u8]) -> Option<&Data<T>> {
-        self.static_children
-            .iter()
-            .filter(|child| {
-                prefix.len() >= child.state.prefix.len()
-                    && child.state.prefix.iter().zip(prefix).all(|(a, b)| a == b)
-            })
-            .find_map(|child| {
-                let rest = &prefix[child.state.prefix.len()..];
-                if rest.is_empty() {
-                    child.conflict(parts)
-                } else {
-                    child.conflict_static(parts, rest)
-                }
-            })
+    fn conflict_static(&self, parts: &[Part<'_>], prefix: &str) -> Option<&Data<T>> {
+        self.static_children.iter().find_map(|child| {
+            let rest = prefix.strip_prefix(&*child.state.prefix)?;
+            if rest.is_empty() {
+                child.conflict(parts)
+            } else {
+                child.conflict_static(parts, rest)
+            }
+        })
     }
 
     fn conflict_dynamic(&self, parts: &[Part<'_>]) -> Option<&Data<T>> {

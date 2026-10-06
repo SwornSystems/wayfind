@@ -10,7 +10,7 @@ const INVALID_PARAM_CHARS: [u8; 4] = [b'*', b'<', b'>', b'/'];
 /// A single part of a template.
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub(crate) enum Part<'a> {
-    Static { prefix: &'a [u8] },
+    Static { prefix: &'a str },
     Dynamic { name: &'a str },
     Wildcard { name: &'a str },
 }
@@ -74,7 +74,7 @@ impl<'a> Template<'a> {
                     return Err(InsertError::UnbalancedAngle);
                 },
                 _ => {
-                    let (part, next_cursor) = Self::parse_static_part(input, cursor);
+                    let (part, next_cursor) = Self::parse_static_part(template, cursor);
 
                     parts.push(part);
                     cursor = next_cursor;
@@ -86,11 +86,11 @@ impl<'a> Template<'a> {
         Ok(Self { parts })
     }
 
-    fn parse_static_part(input: &'a [u8], cursor: usize) -> (Part<'a>, usize) {
-        let end = memchr::memchr2(b'<', b'>', &input[cursor..])
-            .map_or(input.len(), |position| cursor + position);
+    fn parse_static_part(template: &'a str, cursor: usize) -> (Part<'a>, usize) {
+        let end = memchr::memchr2(b'<', b'>', &template.as_bytes()[cursor..])
+            .map_or(template.len(), |position| cursor + position);
 
-        let prefix = &input[cursor..end];
+        let prefix = &template[cursor..end];
         (Part::Static { prefix }, end)
     }
 
@@ -152,7 +152,7 @@ mod tests {
         assert_eq!(
             Template::new("/abcd"),
             Ok(Template {
-                parts: vec![Part::Static { prefix: b"/abcd" }],
+                parts: vec![Part::Static { prefix: "/abcd" }],
             }),
         );
     }
@@ -162,9 +162,7 @@ mod tests {
         assert_eq!(
             Template::new("/<name>"),
             Ok(Template {
-                parts: vec![Part::Dynamic { name: "name" }, Part::Static {
-                    prefix: b"/"
-                },],
+                parts: vec![Part::Dynamic { name: "name" }, Part::Static { prefix: "/" },],
             }),
         );
     }
@@ -175,7 +173,7 @@ mod tests {
             Template::new("/<*wildcard>"),
             Ok(Template {
                 parts: vec![Part::Wildcard { name: "wildcard" }, Part::Static {
-                    prefix: b"/"
+                    prefix: "/"
                 },],
             }),
         );
@@ -187,7 +185,7 @@ mod tests {
             Template::new("/files/<*path>"),
             Ok(Template {
                 parts: vec![Part::Wildcard { name: "path" }, Part::Static {
-                    prefix: b"/files/"
+                    prefix: "/files/"
                 },],
             }),
         );
