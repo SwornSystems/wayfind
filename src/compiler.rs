@@ -1,6 +1,5 @@
 use alloc::boxed::Box;
-use alloc::collections::{BTreeMap, BTreeSet};
-use alloc::string::String;
+use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
 use core::num::NonZeroUsize;
 
@@ -49,9 +48,6 @@ impl Compiler {
         let dynamic_revisitable = revisitable || dynamic_inline;
         let wildcard_revisitable = true;
 
-        let mut seen = BTreeSet::new();
-        let mut prefix = String::new();
-
         let mut dynamic_children: Vec<Node<DynamicState, T>> = builder
             .dynamic_children
             .into_iter()
@@ -64,7 +60,7 @@ impl Compiler {
                 child.state.id = NonZeroUsize::new(self.parameters);
             }
 
-            child.state.suffixes = Suffixes::compute(child, &mut prefix, &mut seen);
+            child.state.suffixes = Suffixes::compute(child);
             child.state.reachable = Reachable::compute(child, &mut self.needles);
         }
 
@@ -80,7 +76,7 @@ impl Compiler {
                 child.state.id = NonZeroUsize::new(self.parameters);
             }
 
-            child.state.suffixes = Suffixes::compute(child, &mut prefix, &mut seen);
+            child.state.suffixes = Suffixes::compute(child);
             child.state.reachable = Reachable::compute(child, &mut self.needles);
         }
 

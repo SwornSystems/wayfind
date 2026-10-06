@@ -1,7 +1,4 @@
 use alloc::boxed::Box;
-use alloc::collections::BTreeSet;
-use alloc::string::String;
-use alloc::vec::Vec;
 use core::num::NonZeroUsize;
 
 use memchr::memmem::FinderRev;
@@ -17,8 +14,8 @@ pub(crate) struct Suffix {
 }
 
 impl Suffix {
-    fn new(suffix: String) -> Self {
-        let bytes = suffix.into_bytes().into_boxed_slice();
+    fn new(suffix: &str) -> Self {
+        let bytes: Box<[u8]> = suffix.as_bytes().into();
         let finder = FinderRev::new(&bytes).into_owned();
         Self { bytes, finder }
     }
@@ -30,22 +27,25 @@ impl Suffix {
     }
 }
 
-/// Pre-computed suffix patterns for parameter matching, sorted longest first.
+/// Pre-computed suffix patterns for parameter matching.
 #[derive(Clone, Default, Debug)]
-pub(crate) struct Suffixes(Box<[Suffix]>);
+pub(crate) struct Suffixes {
+    edges: Box<[Suffix]>,
+    longest: usize,
+}
 
 impl Suffixes {
     /// The length of the longest suffix.
     ///
     /// Zero when there are no suffixes.
-    pub(crate) fn longest(&self) -> usize {
-        self.0.first().map_or(0, |suffix| suffix.bytes.len())
+    pub(crate) const fn longest(&self) -> usize {
+        self.longest
     }
 
-    /// Whether the input starts with any suffix.
+    /// Whether the input starts with any suffix's first edge.
     pub(crate) fn accepts(&self, after: &[u8]) -> bool {
-        self.0.iter().any(|suffix| {
-            after.len() >= suffix.bytes.len() && suffix.bytes.iter().zip(after).all(|(a, b)| a == b)
+        self.edges.iter().any(|edge| {
+            after.len() >= edge.bytes.len() && edge.bytes.iter().zip(after).all(|(a, b)| a == b)
         })
     }
 
@@ -59,9 +59,9 @@ impl Suffixes {
 
         core::iter::from_fn(move || {
             let position = self
-                .0
+                .edges
                 .iter()
-                .filter_map(|suffix| suffix.rfind(remaining, limit))
+                .filter_map(|edge| edge.rfind(remaining, limit))
                 .max()?;
 
             limit = position.saturating_sub(1);
@@ -69,48 +69,37 @@ impl Suffixes {
         })
     }
 
-    /// Computes the suffix set from a node's static descendants.
-    pub(crate) fn compute<S, T>(
-        node: &Node<S, T>,
-        prefix: &mut String,
-        seen: &mut BTreeSet<String>,
-    ) -> Self {
-        seen.clear();
+    /// Computes the suffixes from a node's static descendants.
+    pub(crate) fn compute<S, T>(node: &Node<S, T>) -> Self {
+        let edges = node
+            .static_children
+            .iter()
+            .map(|child| Suffix::new(&child.state.prefix))
+            .collect();
 
-        for child in &node.static_children {
-            Self::walk_static(child, prefix, seen);
-        }
+        let longest = node
+            .static_children
+            .iter()
+            .filter_map(|child| Self::walk_static(child))
+            .max()
+            .unwrap_or(0);
 
-        let mut suffixes: Vec<Suffix> = seen.iter().cloned().map(Suffix::new).collect();
-        suffixes.sort_unstable_by(|a, b| {
-            b.bytes
-                .len()
-                .cmp(&a.bytes.len())
-                .then_with(|| a.bytes.cmp(&b.bytes))
-        });
-
-        Self(suffixes.into_boxed_slice())
+        Self { edges, longest }
     }
 
-    /// Walks a static subtree, recording the accumulated prefix at each node
-    /// that can end a route.
-    fn walk_static<T>(
-        node: &Node<StaticState, T>,
-        prefix: &mut String,
-        seen: &mut BTreeSet<String>,
-    ) {
-        let start = prefix.len();
-        prefix.push_str(&node.state.prefix);
+    /// Walks a static subtree.
+    fn walk_static<T>(node: &Node<StaticState, T>) -> Option<usize> {
+        let deeper = node
+            .static_children
+            .iter()
+            .filter_map(|child| Self::walk_static(child))
+            .max();
 
         let is_terminal = node.data.is_some() || node.parameterized;
-        if is_terminal {
-            seen.insert(prefix.clone());
-        }
+        let here = is_terminal.then_some(0);
 
-        for child in &node.static_children {
-            Self::walk_static(child, prefix, seen);
-        }
-
-        prefix.truncate(start);
+        deeper
+            .max(here)
+            .map(|length| length + node.state.prefix.len())
     }
 }
