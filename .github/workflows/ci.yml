@@ -142,7 +142,7 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
 
   fuzz:
     name: Fuzz
@@ -195,7 +195,7 @@ jobs:
         run: ./scripts/ci/bench-build.nu
 
       - name: Run benchmarks
-        uses: CodSpeedHQ/action@373d6868929f444bc08d901fd0eb0ad52a8875ea # v5.2.1
+        uses: CodSpeedHQ/action@c4fd08a3a159bd0cc208da1e0edf32b8c47d75e5 # v5.4.0
         with:
           mode: simulation,memory
           cycle-estimation: true

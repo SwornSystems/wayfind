@@ -119,11 +119,11 @@ fn matchit_parameters(bencher: divan::Bencher<'_, '_>) {
 
 #[divan::bench(name = "ntex_router")]
 fn ntex_router_default(bencher: divan::Bencher<'_, '_>) {
-    let mut router = ntex_router::Router::<usize>::build();
+    let mut router = ntex_router::Router::<usize>::builder();
     for (index, route) in routes!(brackets).iter().enumerate() {
         router.path(*route, index);
     }
-    let router = router.finish();
+    let router = router.build();
 
     bencher.bench(|| {
         for path in black_box(paths()) {
@@ -135,11 +135,11 @@ fn ntex_router_default(bencher: divan::Bencher<'_, '_>) {
 
 #[divan::bench(name = "ntex_router_parameters")]
 fn ntex_router_parameters(bencher: divan::Bencher<'_, '_>) {
-    let mut router = ntex_router::Router::<usize>::build();
+    let mut router = ntex_router::Router::<usize>::builder();
     for (index, route) in routes!(brackets).iter().enumerate() {
         router.path(*route, index);
     }
-    let router = router.finish();
+    let router = router.build();
 
     bencher.bench(|| {
         for path in black_box(paths()) {

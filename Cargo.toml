@@ -155,7 +155,7 @@ divan = { package = "codspeed-divan-compat", version = "5.0", default-features =
 # Routers
 actix-router = { version = "=0.5.4", default-features = false }
 matchit = { version = "=0.9.2", default-features = false }
-ntex-router = { version = "=1.0.0", default-features = false }
+ntex-router = { version = "=2.1.0", default-features = false }
 path-tree = { version = "=0.8.3", default-features = false }
 route-recognizer = { version = "=0.3.1", default-features = false }
 xitca-router = { version = "=0.4.3", default-features = false }
