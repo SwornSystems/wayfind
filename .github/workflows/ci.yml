@@ -22,8 +22,8 @@ jobs:
     strategy:
       matrix:
         runner:
-          - ubuntu-24.04
-          - ubicloud-standard-4
+          - ubuntu-24.04-arm
+          - ubicloud-standard-4-arm
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
@@ -33,12 +33,12 @@ jobs:
           persist-credentials: false
 
       - name: Setup
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
 
   checks:
     name: Checks
     needs: setup
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: read # checkout
     steps:
@@ -49,7 +49,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
         with:
           rust: "true"
 
@@ -59,7 +59,7 @@ jobs:
   compatibility:
     name: Compatibility
     needs: setup
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: read # checkout
     steps:
@@ -70,7 +70,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
         with:
           rust: "true"
 
@@ -82,7 +82,7 @@ jobs:
   # coverage:
   #   name: Coverage
   #   needs: setup
-  #   runs-on: ubuntu-24.04
+  #   runs-on: ubuntu-24.04-arm
   #   permissions:
   #     contents: read # checkout
   #     id-token: write # codecov
@@ -111,7 +111,7 @@ jobs:
   docs:
     name: Docs
     needs: setup
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: read # checkout
@@ -128,7 +128,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
         with:
           rust: "true"
 
@@ -147,7 +147,7 @@ jobs:
   fuzz:
     name: Fuzz
     needs: setup
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: read # checkout
     steps:
@@ -158,7 +158,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
         with:
           rust: "true"
 
@@ -175,7 +175,7 @@ jobs:
   benches:
     name: Benchmarks
     needs: setup
-    runs-on: ubicloud-standard-4
+    runs-on: ubicloud-standard-4-arm
     permissions:
       contents: read # checkout
       id-token: write # codspeed
@@ -187,7 +187,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
         with:
           rust: "true"
 
