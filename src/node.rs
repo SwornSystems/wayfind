@@ -247,7 +247,9 @@ impl<S, T> Node<S, T> {
             let cap = limit.unwrap_or(bound);
 
             // Try boundaries with known suffix.
+            let mut segment = false;
             for position in child.state.suffixes.positions(remaining, cap) {
+                segment |= limit == Some(position.get());
                 let boundary = offset + position.get();
 
                 ctx.parameters
@@ -270,7 +272,7 @@ impl<S, T> Node<S, T> {
                 },
             };
 
-            if remaining.len() - limit < child.bounds.lower() {
+            if segment || remaining.len() - limit < child.bounds.lower() {
                 ctx.lower(id, offset);
                 continue;
             }
