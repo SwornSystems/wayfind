@@ -124,11 +124,12 @@ When searching, each node tries its children in priority order:
 3. wildcard
 
 All parameters are greedy, consuming as much of the path as possible.
+Parameters never match an empty string.
 
 ### Limitations
 
-No backtracking happens across priority levels.
-Some matches can surprise you.
+Routing ends on first match, not necessarily best match.
+Some matches can surprise you as a result.
 
 In the following router:
 
@@ -142,7 +143,7 @@ In the following router:
 ```
 
 The path `/api/docs/help` would match the first route, not the second.
-Even though the second is arguably more specific.
+Even though the second is ~arguably~ more specific.
 
 ## Performance
 

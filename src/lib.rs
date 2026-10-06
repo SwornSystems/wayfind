@@ -116,6 +116,7 @@
 //! 3. Wildcard: `/<*path>`
 //!
 //! All parameters are greedy, consuming as much of the path as possible.
+//! Parameters never match an empty string.
 //!
 //! ## Display
 //!
