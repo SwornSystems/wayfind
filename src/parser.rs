@@ -1,11 +1,11 @@
-use alloc::string::{String, ToString as _};
+use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
 
 use crate::errors::InsertError;
 
 /// Characters that are not allowed in parameter names.
-const INVALID_PARAM_CHARS: [u8; 4] = [b'*', b'<', b'>', b'/'];
+const INVALID_PARAM_CHARS: [char; 4] = ['*', '<', '>', '/'];
 
 /// A single part of a template.
 #[derive(Clone, Eq, PartialEq, Debug)]
@@ -28,15 +28,15 @@ impl<'a> Template<'a> {
     ///
     /// Returns an error if the template is invalid.
     pub(crate) fn new(template: &'a str) -> Result<Self, InsertError> {
-        let input = template.as_bytes();
-
-        if input.is_empty() {
+        if template.is_empty() {
             return Err(InsertError::Empty);
         }
 
-        if input[0] != b'/' {
+        if !template.starts_with('/') {
             return Err(InsertError::MissingSlash);
         }
+
+        let input = template.as_bytes();
 
         let mut parts = vec![];
         let mut cursor = 0;
@@ -46,7 +46,7 @@ impl<'a> Template<'a> {
         while cursor < input.len() {
             match input[cursor] {
                 b'<' => {
-                    let (part, next) = Self::parse_parameter_part(input, cursor)?;
+                    let (part, next) = Self::parse_parameter_part(template, cursor)?;
 
                     // Check for touching parameters.
                     if seen_parameters
@@ -100,44 +100,42 @@ impl<'a> Template<'a> {
     ///
     /// Returns an error if the parameter is invalid.
     fn parse_parameter_part(
-        input: &'a [u8],
+        template: &'a str,
         cursor: usize,
     ) -> Result<(Part<'a>, usize), InsertError> {
         let start = cursor + 1;
-        let end = memchr::memchr(b'>', &input[start..])
+        let end = memchr::memchr(b'>', &template.as_bytes()[start..])
             .map(|position| start + position)
             .ok_or(InsertError::UnbalancedAngle)?;
 
-        let content = &input[start..end];
-        if content.is_empty() {
-            return Err(InsertError::EmptyParameter);
-        }
-
-        let is_wildcard = content.starts_with(b"*");
-        let name = if is_wildcard { &content[1..] } else { content };
-
-        if is_wildcard && name.is_empty() {
-            return Err(InsertError::EmptyParameter);
-        }
-
-        if name.iter().any(|&c| INVALID_PARAM_CHARS.contains(&c)) {
-            return Err(InsertError::InvalidParameter {
-                name: String::from_utf8_lossy(name).to_string(),
-            });
-        }
-
-        let name: &'a str =
-            core::str::from_utf8(name).map_err(|_err| InsertError::InvalidParameter {
-                name: String::from_utf8_lossy(name).to_string(),
-            })?;
-
-        let part = if is_wildcard {
-            Part::Wildcard { name }
-        } else {
-            Part::Dynamic { name }
+        let content = &template[start..end];
+        let part = match content.strip_prefix('*') {
+            Some(name) => Part::Wildcard {
+                name: Self::parse_name(name)?,
+            },
+            None => Part::Dynamic {
+                name: Self::parse_name(content)?,
+            },
         };
 
         Ok((part, end + 1))
+    }
+
+    /// Validates a parameter name.
+    ///
+    /// # Errors
+    ///
+    /// When the name is empty or invalid.
+    fn parse_name(name: &'a str) -> Result<&'a str, InsertError> {
+        if name.is_empty() {
+            return Err(InsertError::EmptyParameter);
+        }
+
+        if name.chars().any(|char| INVALID_PARAM_CHARS.contains(&char)) {
+            return Err(InsertError::InvalidParameter { name: name.into() });
+        }
+
+        Ok(name)
     }
 }
 
