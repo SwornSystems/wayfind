@@ -75,7 +75,7 @@ pub(crate) struct Node<S, T> {
     pub static_children: Box<[Node<StaticState, T>]>,
     pub dynamic_children: Box<[Node<DynamicState, T>]>,
     pub wildcard_children: Box<[Node<WildcardState, T>]>,
-    pub end_wildcard: Option<EndWildcardState<T>>,
+    pub end_wildcard: Option<Box<EndWildcardState<T>>>,
 
     pub bounds: Bounds,
 
