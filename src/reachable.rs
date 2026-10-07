@@ -3,6 +3,8 @@ use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
 
+use memchr::memmem::FinderRev;
+
 use crate::needle::NeedleCache;
 use crate::node::Node;
 use crate::state::StaticState;
@@ -13,7 +15,10 @@ enum Condition {
     /// The remaining path must end with these bytes.
     EndsWith(Box<[u8]>),
     /// The remaining path must contain these bytes.
-    Contains { needle: Box<[u8]>, id: usize },
+    Contains {
+        needle: Box<FinderRev<'static>>,
+        id: usize,
+    },
 }
 
 impl Condition {
@@ -126,7 +131,7 @@ impl Reachable {
             let len = needles.len();
             let id = *needles.entry(prefix.as_str().into()).or_insert(len);
             let contains = Condition::Contains {
-                needle: prefix.as_bytes().into(),
+                needle: Box::new(FinderRev::new(prefix.as_bytes()).into_owned()),
                 id,
             };
 
