@@ -1,5 +1,7 @@
 use core::num::NonZeroUsize;
 
+use memchr::memmem::FinderRev;
+
 use crate::storage::Storage;
 
 /// Cached rightmost positions for `Contains` checks.
@@ -15,7 +17,12 @@ impl NeedleCache {
     }
 
     /// The rightmost position of the needle, cached after first lookup.
-    pub(crate) fn rightmost(&mut self, id: usize, needle: &[u8], path: &str) -> Option<usize> {
+    pub(crate) fn rightmost(
+        &mut self,
+        id: usize,
+        needle: &FinderRev<'_>,
+        path: &str,
+    ) -> Option<usize> {
         if let Some((_, cached)) = self
             .entries
             .as_slice()
@@ -26,7 +33,7 @@ impl NeedleCache {
             return cached.map(|position| position.get() - 1);
         }
 
-        let position = memchr::memmem::rfind(path.as_bytes(), needle);
+        let position = needle.rfind(path.as_bytes());
         self.entries
             .push((id, position.and_then(|found| NonZeroUsize::new(found + 1))));
 
@@ -43,14 +50,16 @@ mod tests {
     #[test]
     fn found() {
         let mut cache = NeedleCache::new();
-        assert_eq!(cache.rightmost(0, b"/users", "/users/users/1"), Some(6));
-        assert_eq!(cache.rightmost(0, b"/users", "/users/users/1"), Some(6));
+        let needle = FinderRev::new(b"/users");
+        assert_eq!(cache.rightmost(0, &needle, "/users/users/1"), Some(6));
+        assert_eq!(cache.rightmost(0, &needle, "/users/users/1"), Some(6));
     }
 
     #[test]
     fn missing() {
         let mut cache = NeedleCache::new();
-        assert_eq!(cache.rightmost(0, b"/posts", "/users/1"), None);
-        assert_eq!(cache.rightmost(0, b"/posts", "/users/1"), None);
+        let needle = FinderRev::new(b"/posts");
+        assert_eq!(cache.rightmost(0, &needle, "/users/1"), None);
+        assert_eq!(cache.rightmost(0, &needle, "/users/1"), None);
     }
 }
